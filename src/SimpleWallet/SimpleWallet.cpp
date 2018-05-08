@@ -716,12 +716,9 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm)
 
 	if (m_generate_new.empty() && m_wallet_file_arg.empty())
 	{
-		std::cout << "Nor 'generate-new-wallet' neither 'wallet-file' argument was specified.\nWhat do you want to do?\n";
 		std::cout << "O - open wallet\n";
 		std::cout << "G - generate new wallet\n";
 		std::cout << "I - import wallet from keys\n";
-		std::cout << "R - restore backup/paperwallet\n";
-		std::cout << "T - import tracking wallet\n";
 		std::cout << "E - exit\n";
 		
 		char c;
@@ -771,12 +768,8 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm)
 
 		if (c == 'i' || c == 'I')
 			m_import_new = userInput;
-		else if (c == 'r' || c == 'R')
-			m_restore_new = userInput;
 		else if (c == 'g' || c == 'G')
 			m_generate_new = userInput;
-		else if (c == 't' || c == 'T')
-			m_track_new = userInput;
 		else
 			m_wallet_file_arg = userInput;
 	}

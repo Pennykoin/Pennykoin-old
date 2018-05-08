@@ -5,8 +5,9 @@
  Pennykoin is a secure, private cryptocurrency built on the cryptonote protocol ( like Monero).
 Pennykoin is focused on making crypto as easy to use as paper currency. It is built on the Karbo base, but includes code from other coins as well as custom code. 
  
-  This is an opensource community project, feel free to submit a pull request.
-...
+  This is an opensource community project, feel free to submit a pull request. 
+
+ ___
 
 Building Pennykoin 
 
@@ -21,7 +22,7 @@ To build run "git clone https://github.com/jerrimus/Pennykoin" , then change to 
 
  While not nessecary to build, I reccomend installing a newer cmake from [this PPA](https://launchpad.net/~george-edison55/+archive/ubuntu/cmake-3.x)
 
-...
+ ___
 
 Building on Windows
 Dependencies: MSVC 2013 or later, CMake 2.8.6 or later, and Boost 1.55. You may download them from:
@@ -32,12 +33,14 @@ Dependencies: MSVC 2013 or later, CMake 2.8.6 or later, and Boost 1.55. You may 
  
 * https://dl.bintray.com/boostorg/release/1.67.0/binaries/
 
-To build, change to a directory where this file is located, and run these commands: 
-```
+To build, change to a directory where this file is located, and run these commands:  
+ ___ 
+
 mkdir build
 cd build
-cmake -G "Visual Studio 12 Win64" ..
-```
+cmake -G "Visual Studio 12 Win64" .. 
+
+ ___
 
 And then do Build.
 Good luck!
