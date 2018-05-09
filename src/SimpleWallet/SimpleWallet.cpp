@@ -517,7 +517,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
     } while (true);
 
     if (c == 'E' || c == 'e') {
-      exit( );
+      return false;
     }
 
     std::cout << "Specify wallet file name (e.g., wallet.bin).\n";
