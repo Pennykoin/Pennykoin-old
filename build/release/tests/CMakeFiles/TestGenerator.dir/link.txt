@@ -1,2 +1,0 @@
-gcc-ar qc libTestGenerator.a  CMakeFiles/TestGenerator.dir/TestGenerator/TestGenerator.cpp.o
-gcc-ranlib libTestGenerator.a

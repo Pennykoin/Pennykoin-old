@@ -1,2 +1,0 @@
-gcc-ar qc libInProcessNode.a  CMakeFiles/InProcessNode.dir/InProcessNode/InProcessNode.cpp.o CMakeFiles/InProcessNode.dir/InProcessNode/InProcessNodeErrors.cpp.o
-gcc-ranlib libInProcessNode.a
