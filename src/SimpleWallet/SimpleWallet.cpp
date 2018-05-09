@@ -503,7 +503,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
   }
 
   if (m_generate_new.empty() && m_wallet_file_arg.empty()) {
-    std::cout << "Nor 'generate-new-wallet' neither 'wallet-file' argument was specified.\nWhat do you want to do?\n[O]pen existing wallet, [G]enerate new wallet file or [E]xit.\n";
+    std::cout << "Choose an option.\n[O]pen existing wallet\n[G]enerate new wallet file\n[E]xit.\n";
     char c;
     do {
       std::string answer;
@@ -517,7 +517,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
     } while (true);
 
     if (c == 'E' || c == 'e') {
-      return false;
+      exit( );
     }
 
     std::cout << "Specify wallet file name (e.g., wallet.bin).\n";
