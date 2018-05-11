@@ -1,46 +1,47 @@
-This is fork of the reference code for [CryptoNote](https://cryptonote.org) cryptocurrency protocol.
+  
+### Pennykoin - Make Crypto Great Again
 
-* Launch your own CryptoNote currency: [CryptoNote Starter](https://cryptonotestarter.org/)
-* CryptoNote reference implementation: [CryptoNoteCoin](https://cryptonote-coin.org)
-* Discussion board and support: [CryptoNote Forum](https://forum.cryptonote.org)
 
-Forking guilde is omitted here.
+ Pennykoin is a secure, private cryptocurrency built on the cryptonote protocol ( like Monero).
+Pennykoin is focused on making crypto as easy to use as paper currency. It is built on the Karbo base, but includes code from other coins as well as custom code. 
+ 
+  This is an opensource community project, feel free to submit a pull request. 
 
-## Building CryptoNote 
+ ___
 
-### On *nix
+Building Pennykoin 
 
-Dependencies: GCC 4.7.3 or later, CMake 2.8.6 or later, and Boost 1.55.
+On linux ( supported on ubuntu, may work on others)
 
-You may download them from:
+Install dependencies: 
+ 
+     sudo apt-get update && sudo apt install build-essential pkg-config libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev cmake git
 
-* http://gcc.gnu.org/
-* http://www.cmake.org/
-* http://www.boost.org/
-* Alternatively, it may be possible to install them using a package manager.
 
-To build, change to a directory where this file is located, and run `make`. The resulting executables can be found in `build/release/src`.
+To build run "git clone https://github.com/jerrimus/Pennykoin" , then change to the Pennykoin directory, and run `make`. The resulting executables can be found in `build/release/src`.
 
-**Advanced options:**
+ While not nessecary to build, I reccomend installing a newer cmake from [this PPA](https://launchpad.net/~george-edison55/+archive/ubuntu/cmake-3.x)
 
-* Parallel build: run `make -j<number of threads>` instead of `make`.
-* Debug build: run `make build-debug`.
-* Test suite: run `make test-release` to run tests in addition to building. Running `make test-debug` will do the same to the debug version.
-* Building with Clang: it may be possible to use Clang instead of GCC, but this may not work everywhere. To build, run `export CC=clang CXX=clang++` before running `make`.
+ ___
 
-### On Windows
-Dependencies: MSVC 2013 or later, CMake 2.8.6 or later, and Boost 1.55. You may download them from:
+Building on Windows
+Dependencies: MSVC 2013 , CMake, and Boost. To be sure the version is compatible, download them from:
 
-* http://www.microsoft.com/
-* http://www.cmake.org/
-* http://www.boost.org/
+* https://www.visualstudio.com/vs/older-downloads/   Get VS2013 community.
+ 
+* https://cmake.org/download/    Get  	cmake-3.11.1-win64-x64.msi .
+ 
+* https://dl.bintray.com/boostorg/release/1.67.0/binaries/   Get boost_1_67_0-msvc-12.0-64.exe .
 
-To build, change to a directory where this file is located, and run theas commands: 
-```
-mkdir build
-cd build
-cmake -G "Visual Studio 12 Win64" ..
-```
+To build, clone this git, then make a build directory, then enter that directory.  
+Inside the build directory run 
+ 
+     cmake.exe -DBOOST_ROOT=C:\boost_1_67_0 -DBOOST_LIBRARYDIR=C:\boost_1_67_0\stage\lib -G "Visual Studio 12 Win64" .. 
+ ___
 
-And then do Build.
-Good luck!
+  Then open pennykoin.sln in VS, and build all. The binaries will be in /build/debug/src ( i think, need to check on win box) . 
+   
+    
+If you'd like to contribute to developer, you may donate at: 
+ 
+ * BTC: 
