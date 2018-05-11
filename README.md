@@ -42,6 +42,3 @@ Inside the build directory run
   Then open pennykoin.sln in VS, and build all. The binaries will be in /build/debug/src ( i think, need to check on win box) . 
    
     
-If you'd like to contribute to developer, you may donate at: 
- 
- * BTC: 
