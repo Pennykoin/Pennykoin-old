@@ -29,7 +29,7 @@ const size_t   CRYPTONOTE_DISPLAY_DECIMAL_POINT              = 2;
 const uint64_t COIN                                          = UINT64_C(100);  // pow(10, 8)
 const uint64_t MINIMUM_FEE                                   = UINT64_C(2);     // pow(10, 5)
 const uint64_t DEFAULT_DUST_THRESHOLD                        = UINT64_C(1);     // pow(10, 5)
-//const uint64_t GENESIS_BLOCK_REWARD							 = UINT64_C(0);
+const uint64_t GENESIS_BLOCK_REWARD			          				 = UINT64_C(10000000);
 
 const uint64_t DIFFICULTY_TARGET                             = 180; // seconds
 const uint64_t EXPECTED_NUMBER_OF_BLOCKS_PER_DAY             = 24 * 60 * 60 / DIFFICULTY_TARGET;
@@ -37,10 +37,9 @@ const size_t   DIFFICULTY_WINDOW                             = 240; // blocks
 const size_t   DIFFICULTY_CUT                                = 30;  // timestamps to cut after sorting
 const size_t   DIFFICULTY_LAG                                = 15;
 static_assert(2 * DIFFICULTY_CUT <= DIFFICULTY_WINDOW - 2, "Bad DIFFICULTY_WINDOW or DIFFICULTY_CUT");
-
-const uint64_t DEPOSIT_MIN_AMOUNT                            = 100 * COIN;
-const uint32_t DEPOSIT_MIN_TERM                              = 11000;
-const uint32_t DEPOSIT_MAX_TERM                              = 1 * 12 * 11000;
+const uint64_t DEPOSIT_MIN_AMOUNT                            = 1000000000 * COIN;
+const uint32_t DEPOSIT_MIN_TERM                              = 1100000;
+const uint32_t DEPOSIT_MAX_TERM                              = 1 * 12 * 1100000;
 const uint64_t DEPOSIT_MIN_TOTAL_RATE_FACTOR                 = 77000;
 const uint64_t DEPOSIT_MAX_TOTAL_RATE                        = 107;
 static_assert(DEPOSIT_MIN_TERM > 0, "Bad DEPOSIT_MIN_TERM");
@@ -78,12 +77,12 @@ const char     CRYPTONOTE_BLOCKCHAIN_INDICES_FILENAME[]      = "blockchainindice
 const char     MINER_CONFIG_FILE_NAME[]                      = "miner_conf.json";
 } // parameters
 
-const uint64_t START_BLOCK_REWARD                            = (UINT64_C(10000) * parameters::COIN);
-const uint64_t MIN_BLOCK_REWARD                              = (UINT64_C(10) * parameters::COIN);
-const uint64_t REWARD_HALVING_INTERVAL                       = (UINT64_C(88000));
+const uint64_t START_BLOCK_REWARD                            = (UINT64_C(12000) * parameters::COIN);
+const uint64_t MIN_BLOCK_REWARD                              = (UINT64_C(12000) * parameters::COIN);
+const uint64_t REWARD_HALVING_INTERVAL                       = (UINT64_C(132000));
 
-const char     CRYPTONOTE_NAME[]                             = "bitcedi";
-const char     GENESIS_COINBASE_TX_HEX[]                     = "010601ff0001c0843d029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd0880712101f959c9048a0d5d173b366d184a69aeef5b217a723da1508c30e500c830d15705";
+const char     CRYPTONOTE_NAME[]                             = "pennykoin";
+const char     GENESIS_COINBASE_TX_HEX[]                     = "010601ff0001809f49029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd0880712101a491e47d5d7175d7defb686ca920320bc8c57b44c08ab3aaa9d37593c6b92a30";
 const uint32_t GENESIS_NONCE                                 = 70;
 
 const uint8_t  TRANSACTION_VERSION_1                         =  1;
@@ -116,8 +115,8 @@ const size_t   P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT          = 5000;          //
 const char     P2P_STAT_TRUSTED_PUB_KEY[]                    = "";
 
 const std::initializer_list<const char*> SEED_NODES = {
-   "seed1.pennykoin.com:53280",
-   "seed2.pennykoin.com:53281"
+   "seed1.pennykoin.com:33211",
+   "seed2.pennykoin.com:33212"
 };
 
 struct CheckpointData {
