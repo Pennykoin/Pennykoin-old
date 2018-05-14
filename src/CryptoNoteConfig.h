@@ -36,8 +36,8 @@ const uint64_t GENESIS_BLOCK_REWARD			          		  		 = UINT64_C(0);
 
 const uint64_t DIFFICULTY_TARGET                             = 180; // seconds
 const uint64_t EXPECTED_NUMBER_OF_BLOCKS_PER_DAY             = 24 * 60 * 60 / DIFFICULTY_TARGET;
-const size_t   DIFFICULTY_WINDOW                             = 240; // blocks
-const size_t   DIFFICULTY_CUT                                = 30;  // timestamps to cut after sorting
+const size_t   DIFFICULTY_WINDOW                             = 40; // blocks
+const size_t   DIFFICULTY_CUT                                = 10;  // timestamps to cut after sorting
 const size_t   DIFFICULTY_LAG                                = 15;
 static_assert(2 * DIFFICULTY_CUT <= DIFFICULTY_WINDOW - 2, "Bad DIFFICULTY_WINDOW or DIFFICULTY_CUT");
 const uint64_t DEPOSIT_MIN_AMOUNT                            = 25000 * COIN;
@@ -132,7 +132,7 @@ __attribute__((unused))
 #endif
 
 const std::initializer_list<CheckpointData> CHECKPOINTS = {
-
+ { 680, "b5c5635f1de8934468b35c5e4ae48f4fc6e47ae21d85d0e1b563835f2b40f88d" },
 	
 };
 
