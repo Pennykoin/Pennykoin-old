@@ -478,6 +478,38 @@ difficulty_type Currency::nextDifficulty(std::vector<uint64_t> timestamps,
     timeSpan = 1;
   }
 
+  uint64_t timespanMedian = 0;
+  if (cutBegin > 0 && length >= cutBegin * 2 + 3){
+      std::vector<std::uint64_t> time_spans;
+      for (size_t i = length - cutBegin * 2 - 3; i < length - 1; i++){
+        uint64_t time_span = timestamps[i + 1] - timestamps[i];
+        if (time_span == 0) {
+          time_span = 1;
+        }
+        time_spans.push_back(time_span);
+      }
+      double median;
+      size_t spans_size = time_spans.size();
+      sort(time_spans.begin(), time_spans.end());
+      if (spans_size % 2 == 0){
+        median = (time_spans[spans_size / 2 - 1] + time_spans[spans_size / 2]) / 2;
+      }
+      else{
+        median = time_spans[spans_size / 2];
+      }
+      timespanMedian = static_cast<uint64_t>(median);
+  }
+  
+  uint64_t timespanLength = length - cutBegin * 2 - 1;
+  uint64_t totalTimespanMedian = timespanMedian > 0 ? timespanMedian * timespanLength : timeSpan * 7 / 10; 
+  uint64_t adjustedTotalTimespan = (timeSpan * 8 + totalTimespanMedian * 3) / 10; //Sumocoin: [ref: poisson distribution]
+  if (adjustedTotalTimespan > MAX_AVERAGE_TIMESPAN * timespanLength){
+      adjustedTotalTimespan = MAX_AVERAGE_TIMESPAN * timespanLength;
+  }
+  if (adjustedTotalTimespan < MIN_AVERAGE_TIMESPAN * timespanLength){
+      adjustedTotalTimespan = MIN_AVERAGE_TIMESPAN * timespanLength;
+}
+
   difficulty_type totalWork = cumulativeDifficulties[cutEnd - 1] - cumulativeDifficulties[cutBegin];
   assert(totalWork > 0);
 
@@ -487,8 +519,12 @@ difficulty_type Currency::nextDifficulty(std::vector<uint64_t> timestamps,
     return 0;
   }
 
-  return (low + timeSpan - 1) / timeSpan;
+  
+  uint64_t nextDiff = (low + adjustedTotalTimespan - 1) / adjustedTotalTimespan;
+  if (nextDiff < 1) nextDiff = 1;
+return nextDiff;
 }
+
 
 bool Currency::checkProofOfWork(Crypto::cn_context& context, const Block& block, difficulty_type currentDiffic,
   Crypto::Hash& proofOfWork) const {

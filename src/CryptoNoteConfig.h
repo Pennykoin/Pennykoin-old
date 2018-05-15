@@ -34,11 +34,11 @@ const uint64_t GENESIS_BLOCK_REWARD			          		  		 = UINT64_C(0);
 
 
 
-const uint64_t DIFFICULTY_TARGET                             = 180; // seconds
+const uint64_t DIFFICULTY_TARGET                             = 120; // seconds
 const uint64_t EXPECTED_NUMBER_OF_BLOCKS_PER_DAY             = 24 * 60 * 60 / DIFFICULTY_TARGET;
-const size_t   DIFFICULTY_WINDOW                             = 240; // blocks
-const size_t   DIFFICULTY_CUT                                = 15;  // timestamps to cut after sorting
-const size_t   DIFFICULTY_LAG                                = 15;
+const size_t   DIFFICULTY_WINDOW                             = 40; // blocks
+const size_t   DIFFICULTY_CUT                                = 5;  // timestamps to cut after sorting
+const size_t   DIFFICULTY_LAG                                = 1;
 static_assert(2 * DIFFICULTY_CUT <= DIFFICULTY_WINDOW - 2, "Bad DIFFICULTY_WINDOW or DIFFICULTY_CUT");
 const uint64_t DEPOSIT_MIN_AMOUNT                            = 25000 * COIN;
 const uint32_t DEPOSIT_MIN_TERM                              = 43800;
@@ -80,8 +80,8 @@ const char     CRYPTONOTE_BLOCKCHAIN_INDICES_FILENAME[]      = "blockchainindice
 const char     MINER_CONFIG_FILE_NAME[]                      = "miner_conf.json";
 } // parameters
 
-const uint64_t START_BLOCK_REWARD                            = (UINT64_C(12000) * parameters::COIN);
-const uint64_t MIN_BLOCK_REWARD                              = (UINT64_C(12000) * parameters::COIN);
+const uint64_t START_BLOCK_REWARD                            = (UINT64_C(800) * parameters::COIN);
+const uint64_t MIN_BLOCK_REWARD                              = (UINT64_C(8000) * parameters::COIN);
 const uint64_t REWARD_HALVING_INTERVAL                       = (UINT64_C(132000));
 
 const char     CRYPTONOTE_NAME[]                             = "pennykoin";
