@@ -1,0 +1,35 @@
+# The set of languages for which implicit dependencies are needed:
+set(CMAKE_DEPENDS_LANGUAGES
+  "CXX"
+  )
+# The set of files for implicit dependencies of each language:
+set(CMAKE_DEPENDS_CHECK_CXX
+  "/home/jerr/pk/src/Rpc/HttpClient.cpp" "/home/jerr/pk/build/release/src/CMakeFiles/Rpc.dir/Rpc/HttpClient.cpp.o"
+  "/home/jerr/pk/src/Rpc/HttpServer.cpp" "/home/jerr/pk/build/release/src/CMakeFiles/Rpc.dir/Rpc/HttpServer.cpp.o"
+  "/home/jerr/pk/src/Rpc/JsonRpc.cpp" "/home/jerr/pk/build/release/src/CMakeFiles/Rpc.dir/Rpc/JsonRpc.cpp.o"
+  "/home/jerr/pk/src/Rpc/RpcServer.cpp" "/home/jerr/pk/build/release/src/CMakeFiles/Rpc.dir/Rpc/RpcServer.cpp.o"
+  "/home/jerr/pk/src/Rpc/RpcServerConfig.cpp" "/home/jerr/pk/build/release/src/CMakeFiles/Rpc.dir/Rpc/RpcServerConfig.cpp.o"
+  "/home/jerr/pk/src/Rpc/RpcServer - copy.cpp" "/home/jerr/pk/build/release/src/CMakeFiles/Rpc.dir/Rpc/RpcServer_-_copy.cpp.o"
+  )
+set(CMAKE_CXX_COMPILER_ID "GNU")
+
+# Preprocessor definitions for this target.
+set(CMAKE_TARGET_DEFINITIONS_CXX
+  "STATICLIB"
+  )
+
+# The include file search paths:
+set(CMAKE_CXX_TARGET_INCLUDE_PATH
+  "../../include"
+  "../../src"
+  "../../external"
+  "version"
+  "../../src/Platform/Linux"
+  )
+
+# Targets to which this target links.
+set(CMAKE_TARGET_LINKED_INFO_FILES
+  )
+
+# Fortran module output directory.
+set(CMAKE_Fortran_TARGET_MODULE_DIR "")
