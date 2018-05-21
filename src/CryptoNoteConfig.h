@@ -140,6 +140,7 @@ const char     P2P_STAT_TRUSTED_PUB_KEY[]                    = "0000000000000000
 const std::initializer_list<const char*> SEED_NODES = {
   "seed1.pennykoin.com:53280",
   "seed2.pennykoin.com:53280",
+  "seed3.pennykoin.com:53280",
   "pk.youpool.io:53280"
 };
 
