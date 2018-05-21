@@ -140,6 +140,7 @@ const char     P2P_STAT_TRUSTED_PUB_KEY[]                    = "0000000000000000
 const std::initializer_list<const char*> SEED_NODES = {
   "seed1.pennykoin.com:53280",
   "seed2.pennykoin.com:53280",
+  "pk.youpool.io:53280"
 };
 
 struct CheckpointData {
@@ -156,7 +157,8 @@ __attribute__((unused))
 const std::initializer_list<CheckpointData> CHECKPOINTS = {
 
   { 680, "b5c5635f1de8934468b35c5e4ae48f4fc6e47ae21d85d0e1b563835f2b40f88d" },
-  { 1550, "a01ca16cb141e1a20b6c45651e124660117180503369cbc4f89f82a544a44720" }
+  { 1550, "a01ca16cb141e1a20b6c45651e124660117180503369cbc4f89f82a544a44720" },
+  {4145, "3eb7f65c24bb414684de610c863cbd4bf6a1638746361d8db1a5ef03eb2d0690"}
 
 };
 
