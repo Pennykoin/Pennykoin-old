@@ -52,6 +52,9 @@ const size_t   DIFFICULTY_LAG_V1                             = DIFFICULTY_LAG;
 const size_t   DIFFICULTY_LAG_V2                             = DIFFICULTY_LAG;
 static_assert(2 * DIFFICULTY_CUT <= DIFFICULTY_WINDOW - 2, "Bad DIFFICULTY_WINDOW or DIFFICULTY_CUT");
 
+const uint64_t MIN_TX_MIXIN_SIZE                            = 7;
+const uint64_t MAX_TX_MIXIN_SIZE                            = 7;
+
 const uint64_t DEPOSIT_MIN_AMOUNT                            = 25000 * COIN;
 const uint32_t DEPOSIT_MIN_TERM                              = 43800; // ~1 month
 const uint32_t DEPOSIT_MAX_TERM                              = DEPOSIT_MIN_TERM; // ~1 year
@@ -88,12 +91,12 @@ const size_t   UPGRADE_WINDOW                                = EXPECTED_NUMBER_O
 static_assert(0 < UPGRADE_VOTING_THRESHOLD && UPGRADE_VOTING_THRESHOLD <= 100, "Bad UPGRADE_VOTING_THRESHOLD");
 static_assert(UPGRADE_VOTING_WINDOW > 1, "Bad UPGRADE_VOTING_WINDOW");
 
-const char     CRYPTONOTE_BLOCKS_FILENAME[]                  = "blocks.dat";
-const char     CRYPTONOTE_BLOCKINDEXES_FILENAME[]            = "blockindexes.dat";
-const char     CRYPTONOTE_BLOCKSCACHE_FILENAME[]             = "blockscache.dat";
+const char     CRYPTONOTE_BLOCKS_FILENAME[]                  = "pnblocks.dat";
+const char     CRYPTONOTE_BLOCKINDEXES_FILENAME[]            = "pnndexes.dat";
+const char     CRYPTONOTE_BLOCKSCACHE_FILENAME[]             = "pncache.dat";
 const char     CRYPTONOTE_POOLDATA_FILENAME[]                = "poolstate.bin";
 const char     P2P_NET_DATA_FILENAME[]                       = "p2pstate.bin";
-const char     CRYPTONOTE_BLOCKCHAIN_INDICES_FILENAME[]      = "blockchainindices.dat";
+const char     CRYPTONOTE_BLOCKCHAIN_INDICES_FILENAME[]      = "pnbcindices.dat";
 const char     MINER_CONFIG_FILE_NAME[]                      = "miner_conf.json";
 
 } // parameters
@@ -138,10 +141,10 @@ const size_t   P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT          = 5000; // 5 second
 const char     P2P_STAT_TRUSTED_PUB_KEY[]                    = "0000000000000000000000000000000000000000000000000000000000000000";
 
 const std::initializer_list<const char*> SEED_NODES = {
-  "seed1.pennykoin.com:53280",
   "seed2.pennykoin.com:53280",
   "seed3.pennykoin.com:53280",
-  "pk.youpool.io:53280"
+  "pk.youpool.io:53280",
+  "PK.hashpool.frl:53280"
 };
 
 struct CheckpointData {
@@ -159,7 +162,7 @@ const std::initializer_list<CheckpointData> CHECKPOINTS = {
 
   { 680, "b5c5635f1de8934468b35c5e4ae48f4fc6e47ae21d85d0e1b563835f2b40f88d" },
   { 1550, "3576f6075b79223a3bbf9b7404b0a0687eb6f20b7cec0c07ddbcc6ed8ae59430" },
-  { 4216, "31e47d30d40ea97329914b55c48c58f722d32947b23c4b90c9d8985a70553a0e" }
+  { 4216, "4c2c769b66b43e1d07f1f9233c089ebf8a6ebfd221513bf66078d672b2a25396" }
 
 };
 
