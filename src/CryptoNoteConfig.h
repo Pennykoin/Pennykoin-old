@@ -110,7 +110,6 @@ const char     CRYPTONOTE_NAME[]                             = "pennykoin";
 const char     GENESIS_COINBASE_TX_HEX[]                     = "010a01ff0001809f49029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd088071210108f03d181bff7e9a1657cfc944a57095390701da99f47e449a65c3913b739e60";
 const uint32_t GENESIS_NONCE                                 = 70;
 const uint64_t GENESIS_TIMESTAMP                             = 0;
-
 const uint8_t  TRANSACTION_VERSION_1                         = 1;
 const uint8_t  TRANSACTION_VERSION_2                         = 2;
 const uint8_t  BLOCK_MAJOR_VERSION_1                         = 1;

@@ -558,7 +558,7 @@ simple_wallet::simple_wallet(System::Dispatcher& dispatcher, const CryptoNote::C
   m_walletSynchronized(false) {
   m_consoleHandler.setHandler("start_mining", boost::bind(&simple_wallet::start_mining, this, _1), "start_mining [<number_of_threads>] - Start mining in daemon");
   m_consoleHandler.setHandler("stop_mining", boost::bind(&simple_wallet::stop_mining, this, _1), "Stop mining in daemon");
-  m_consoleHandler.setHandler("export_keys", boost::bind(&simple_wallet::export_keys, this, _1), "Show the secret keys of the opened wallet");
+  m_consoleHandler.setHandler("export_key", boost::bind(&simple_wallet::export_keys, this, _1), "Show private key of the opened wallet");
   m_consoleHandler.setHandler("balance", boost::bind(&simple_wallet::show_balance, this, _1), "Show current wallet balance");
   m_consoleHandler.setHandler("incoming_transfers", boost::bind(&simple_wallet::show_incoming_transfers, this, _1), "Show incoming transfers");
   m_consoleHandler.setHandler("list_transfers", boost::bind(&simple_wallet::listTransfers, this, _1), "Show all known transfers");
@@ -606,7 +606,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
   }
 
   if (m_generate_new.empty() && m_wallet_file_arg.empty()) {
-    std::cout << "Choose from the following\n \n[O]pen existing wallet\n[G]enerate new wallet\n[I]mport from spend & receive keys\n[E]xit.\n";
+    std::cout << "Choose from the following\n \n[O]pen existing wallet\n[G]enerate new wallet\n[I]mport from private key\n[E]xit.\n";
     char c;
     do {
       std::string answer;
@@ -632,7 +632,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
     } while (userInput.empty());
 
     if (c == 'i' || c == 'I') {
-      m_import_new = userInput;
+     m_restore_new = userInput;
     } else if (c == 'g' || c == 'G') {
       m_generate_new = userInput;
     } else {
@@ -646,11 +646,9 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
   }
 
   std::string walletFileName;
-  if (!m_generate_new.empty() || !m_import_new.empty() || !m_restore_new.empty()) {
+  if (!m_generate_new.empty() || !m_restore_new.empty()) {
     std::string ignoredString;
 if (!m_generate_new.empty()) {
-      WalletHelper::prepareFileNames(m_generate_new, ignoredString, walletFileName);
-    } else if (!m_import_new.empty()) {
       WalletHelper::prepareFileNames(m_import_new, ignoredString, walletFileName);
     } else if (!m_restore_new.empty()) {
       WalletHelper::prepareFileNames(m_restore_new, ignoredString, walletFileName);
@@ -776,7 +774,7 @@ if (!m_generate_new.empty()) {
       uint64_t addressPrefix;
       std::string data;
 
-      if (private_key_string.length() != 183) {
+      if (private_key_string.length() != 185) {
           logger(ERROR, BRIGHT_RED) << "Wrong Private key.";
           return false;
       }
@@ -1165,9 +1163,7 @@ void simple_wallet::synchronizationProgressUpdated(uint32_t current, uint32_t to
 bool simple_wallet::export_keys(const std::vector<std::string>& args/* = std::vector<std::string>()*/) {
   AccountKeys keys;
   m_wallet->getAccountKeys(keys);
-  success_msg_writer(true) << "Spend secret key: " << Common::podToHex(keys.spendSecretKey);
-  success_msg_writer(true) << "View secret key: " <<  Common::podToHex(keys.viewSecretKey);
-  success_msg_writer(true) << "Private keys: " <<  Tools::Base58::encode_addr(parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
+  success_msg_writer(true) << "Private key: " <<  Tools::Base58::encode_addr(parameters::CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX,
     std::string(reinterpret_cast<char*>(&keys), sizeof(keys)));
   
   return true;
