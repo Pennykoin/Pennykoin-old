@@ -17,7 +17,7 @@ set(CMAKE_SUPPRESS_REGENERATION ON)
 configure_file(${CMAKE_SOURCE_DIR}/CTestCustom.cmake ${CMAKE_BINARY_DIR})
 
 project(pennykoin)
-
+include_directories(/bcdata)
 include_directories(include src external "${CMAKE_BINARY_DIR}/version")
 if(APPLE)
   include_directories(SYSTEM /usr/include/malloc)

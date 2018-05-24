@@ -56,8 +56,8 @@ const uint64_t MIN_TX_MIXIN_SIZE                            = 7;
 const uint64_t MAX_TX_MIXIN_SIZE                            = 7;
 
 const uint64_t DEPOSIT_MIN_AMOUNT                            = 25000 * COIN;
-const uint32_t DEPOSIT_MIN_TERM                              = 43800; // ~1 month
-const uint32_t DEPOSIT_MAX_TERM                              = DEPOSIT_MIN_TERM; // ~1 year
+const uint32_t DEPOSIT_MIN_TERM                              = 43800; // ~3 months
+const uint32_t DEPOSIT_MAX_TERM                              = DEPOSIT_MIN_TERM; // ditto 
 const uint64_t DEPOSIT_MIN_TOTAL_RATE_FACTOR                 = 0; // rate is constant
 const uint64_t DEPOSIT_MAX_TOTAL_RATE                        = 1; // percentage rate for DEPOSIT_MAX_TERM
 static_assert(DEPOSIT_MIN_TERM > 0, "Bad DEPOSIT_MIN_TERM");
