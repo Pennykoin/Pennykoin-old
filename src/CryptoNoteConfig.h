@@ -140,6 +140,7 @@ const size_t   P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT          = 5000; // 5 second
 const char     P2P_STAT_TRUSTED_PUB_KEY[]                    = "0000000000000000000000000000000000000000000000000000000000000000";
 
 const std::initializer_list<const char*> SEED_NODES = {
+  "seed1.pennykoin.com:53280",
   "seed2.pennykoin.com:53280",
   "seed3.pennykoin.com:53280",
   "pk.youpool.io:53280",
@@ -161,8 +162,8 @@ const std::initializer_list<CheckpointData> CHECKPOINTS = {
 
   { 680, "b5c5635f1de8934468b35c5e4ae48f4fc6e47ae21d85d0e1b563835f2b40f88d" },
   { 1550, "3576f6075b79223a3bbf9b7404b0a0687eb6f20b7cec0c07ddbcc6ed8ae59430" },
-  { 4216, "4c2c769b66b43e1d07f1f9233c089ebf8a6ebfd221513bf66078d672b2a25396" }
-
+  { 4216, "4c2c769b66b43e1d07f1f9233c089ebf8a6ebfd221513bf66078d672b2a25396" },
+  { 7279, "8a577fee7dc3e5a07829b5e2abdebe7d11efb31b25d0943d4d8e6473da8ee6bf" }
 };
 
 } // CryptoNote
