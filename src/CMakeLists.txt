@@ -30,8 +30,6 @@ file(GLOB_RECURSE WalletLegacy WalletLegacy/*)
 file(GLOB_RECURSE JsonRpcServer JsonRpcServer/*)
 
 file(GLOB_RECURSE PaymentGate PaymentGate/*)
-file(GLOB_RECURSE PaymentGateService PaymentGateService/*)
-file(GLOB_RECURSE Miner Miner/*)
 
 source_group("" FILES $${Common} ${Crypto} ${CryptoNoteCore} ${CryptoNoteProtocol} ${Daemon} ${JsonRpcServer} ${Http} ${Logging} ${NodeRpcProxy} ${P2p} ${Rpc} ${Serialization} ${SimpleWallet} ${System} ${Transfers} ${Wallet} ${WalletLegacy})
 
@@ -54,8 +52,7 @@ add_library(JsonRpcServer ${JsonRpcServer})
 
 add_executable(Daemon ${Daemon})
 add_executable(SimpleWallet ${SimpleWallet})
-add_executable(PaymentGateService ${PaymentGateService})
-add_executable(Miner ${Miner})
+
 
 if (MSVC)
   target_link_libraries(System ws2_32)
@@ -64,17 +61,14 @@ endif ()
 set( CryptoNoteCore Logging Crypto P2P Rpc Http Serialization Common System ${Boost_LIBRARIES})
 target_link_libraries(Daemon CryptoNoteCore P2P Rpc System Http Logging Common Crypto upnpc-static BlockchainExplorer ${Boost_LIBRARIES} Serialization)
 target_link_libraries(SimpleWallet Wallet NodeRpcProxy Transfers Rpc Http CryptoNoteCore System Logging Common Crypto ${Boost_LIBRARIES} Serialization)
-target_link_libraries(PaymentGateService PaymentGate JsonRpcServer Wallet NodeRpcProxy Transfers CryptoNoteCore Crypto P2P Rpc Http System Logging Common InProcessNode upnpc-static BlockchainExplorer ${Boost_LIBRARIES} Serialization)
-target_link_libraries(Miner CryptoNoteCore Rpc System Http Logging Common Crypto ${Boost_LIBRARIES} Serialization)
+target_link_libraries(PaymentGate JsonRpcServer Wallet NodeRpcProxy Transfers CryptoNoteCore Crypto P2P Rpc Http System Logging Common InProcessNode upnpc-static BlockchainExplorer ${Boost_LIBRARIES} Serialization)
+target_link_libraries(CryptoNoteCore Rpc System Http Logging Common Crypto ${Boost_LIBRARIES} Serialization)
 
 add_dependencies(Rpc version)
 
 add_dependencies(Daemon version)
 add_dependencies(SimpleWallet version)
-add_dependencies(PaymentGateService version)
 add_dependencies(P2P version)
 
 set_property(TARGET SimpleWallet PROPERTY OUTPUT_NAME "pkwallet")
-set_property(TARGET PaymentGateService PROPERTY OUTPUT_NAME "walletd")
-set_property(TARGET Miner PROPERTY OUTPUT_NAME "miner")
 set_property(TARGET Daemon PROPERTY OUTPUT_NAME "pkdaemon")
