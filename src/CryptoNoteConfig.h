@@ -16,7 +16,9 @@ const uint64_t CRYPTONOTE_MAX_BLOCK_NUMBER                   = 500000000;
 const size_t   CRYPTONOTE_MAX_BLOCK_BLOB_SIZE                = 500000000;
 const size_t   CRYPTONOTE_MAX_TX_SIZE                        = 1000000000;
 const uint64_t CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX       = 136; // addresses start with "0xc"
-const size_t   CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW          = 6;
+const size_t   CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW          = 10;
+const size_t   CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW_V2       = 6; //changed later
+
 const uint64_t CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT            = DIFFICULTY_TARGET * 3;
 const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW             = 30;
 
@@ -40,7 +42,9 @@ const size_t   DIFFICULTY_LAG                                = 15;
 static_assert(2 * DIFFICULTY_CUT <= DIFFICULTY_WINDOW - 2, "Bad DIFFICULTY_WINDOW or DIFFICULTY_CUT");
 
 const uint64_t DEPOSIT_MIN_AMOUNT                            = 25000 * COIN;
-const uint32_t DEPOSIT_MIN_TERM                              = 43200;
+const uint32_t DEPOSIT_MIN_TERM                              = 43800; // ~3 months
+const uint32_t DEPOSIT_MIN_TERM_V2                           = 43200; // changed in later fork
+
 const uint32_t DEPOSIT_MAX_TERM                              = DEPOSIT_MIN_TERM;
 const uint64_t DEPOSIT_MIN_TOTAL_RATE_FACTOR                 = 0;
 const uint64_t DEPOSIT_MAX_TOTAL_RATE                        = 1;
@@ -88,7 +92,7 @@ const uint64_t REWARD_HALVING_INTERVAL                       = (UINT64_C(132000)
 const char     CRYPTONOTE_NAME[]                             = "pennykoin";
 const char     GENESIS_COINBASE_TX_HEX[]                     = "010a01ff0001809f49029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd088071210108f03d181bff7e9a1657cfc944a57095390701da99f47e449a65c3913b739e60";
 const uint32_t GENESIS_NONCE                                 = 70;
-
+const uint64_t GENESIS_TIMESTAMP                             =  0;
 const uint8_t  TRANSACTION_VERSION_1                         =  1;
 const uint8_t  TRANSACTION_VERSION_2                         =  2;
 const uint8_t  BLOCK_MAJOR_VERSION_1                         =  1;
