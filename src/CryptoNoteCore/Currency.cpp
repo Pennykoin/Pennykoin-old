@@ -132,9 +132,13 @@ bool Currency::getBlockReward(size_t medianSize, size_t currentBlockSize, uint64
   }
 
   uint64_t penalizedBaseReward = getPenalizedAmount(baseReward, medianSize, currentBlockSize);
+  uint64_t penalizedFee = getPenalizedAmount(fee, medianSize, currentBlockSize); // tag 2
 
-  emissionChange = penalizedBaseReward;
-  reward = penalizedBaseReward + fee;
+  emissionChange = penalizedBaseReward - (fee - penalizedFee); // tag: 2
+  reward = penalizedBaseReward + penalizedFee;
+
+  // emissionChange = penalizedBaseReward; // bug on block 7023?
+  // reward = penalizedBaseReward + fee;
 
   return true;
 }
