@@ -16,7 +16,7 @@ const uint64_t CRYPTONOTE_MAX_BLOCK_NUMBER                   = 500000000;
 const size_t   CRYPTONOTE_MAX_BLOCK_BLOB_SIZE                = 500000000;
 const size_t   CRYPTONOTE_MAX_TX_SIZE                        = 1000000000;
 const uint64_t CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX       = 136; // addresses start with "0xc"
-const size_t   CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW          = 6;
+const size_t   CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW          = 10;
 const uint64_t CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT            = DIFFICULTY_TARGET * 3;
 const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW             = 30;
 
@@ -40,7 +40,7 @@ const size_t   DIFFICULTY_LAG                                = 15;
 static_assert(2 * DIFFICULTY_CUT <= DIFFICULTY_WINDOW - 2, "Bad DIFFICULTY_WINDOW or DIFFICULTY_CUT");
 
 const uint64_t DEPOSIT_MIN_AMOUNT                            = 25000 * COIN;
-const uint32_t DEPOSIT_MIN_TERM                              = 43200;
+const uint32_t DEPOSIT_MIN_TERM                              = 43800;
 const uint32_t DEPOSIT_MAX_TERM                              = DEPOSIT_MIN_TERM;
 const uint64_t DEPOSIT_MIN_TOTAL_RATE_FACTOR                 = 0;
 const uint64_t DEPOSIT_MAX_TOTAL_RATE                        = 1;

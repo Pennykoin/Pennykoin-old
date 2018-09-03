@@ -917,12 +917,12 @@ bool Blockchain::validate_miner_transaction(const Block& b, uint32_t height, siz
   get_last_n_blocks_sizes(lastBlocksSizes, m_currency.rewardBlocksWindow());
   size_t blocksSizeMedian = Common::medianValue(lastBlocksSizes);
 
-  if (!m_currency.getBlockReward(blocksSizeMedian, cumulativeBlockSize, alreadyGeneratedCoins, fee, height, reward, emissionChange)) {
+  if (height>20000 and !m_currency.getBlockReward(blocksSizeMedian, cumulativeBlockSize, alreadyGeneratedCoins, fee, height, reward, emissionChange)) {
     logger(INFO, BRIGHT_WHITE) << "block size " << cumulativeBlockSize << " is bigger than allowed for this blockchain";
     return false;
   }
 
-  if (minerReward > reward) {
+  if (height>20000 and minerReward > reward){
     logger(ERROR, BRIGHT_RED) << "Coinbase transaction spend too much money: " << m_currency.formatAmount(minerReward) <<
       ", block reward is " << m_currency.formatAmount(reward);
     return false;
@@ -1600,7 +1600,7 @@ bool Blockchain::check_tx_outputs(const Transaction& tx) const {
       } else {
         const auto& multisignatureOutput = ::boost::get<MultisignatureOutput>(out.target);
         if (multisignatureOutput.term != 0) {
-          if (multisignatureOutput.term < m_currency.depositMinTerm() || multisignatureOutput.term > m_currency.depositMaxTerm()) {
+          if (multisignatureOutput.term < 43200 || multisignatureOutput.term > m_currency.depositMaxTerm()) {
             logger(INFO, BRIGHT_WHITE) << getObjectHash(tx) << " multisignature output has invalid term: " << multisignatureOutput.term;
             return false;
           } else if (out.amount < m_currency.depositMinAmount()) {
@@ -1799,7 +1799,7 @@ bool Blockchain::pushBlock(const Block& blockData, const std::vector<Transaction
   difficulty_type currentDifficulty = getDifficultyForNextBlock();
   auto target_calculating_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - targetTimeStart).count();
 
-  if (!(currentDifficulty)) {
+  if (height>20000 and !(currentDifficulty)) {
     logger(ERROR, BRIGHT_RED) << "!!!!!!!!! difficulty overhead !!!!!!!!!";
     return false;
   }
