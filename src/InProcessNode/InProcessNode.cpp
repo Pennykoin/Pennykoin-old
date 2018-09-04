@@ -317,7 +317,7 @@ namespace CryptoNote {
 				return make_error_code(CryptoNote::error::REQUEST_ERROR);
 			}
 
-			if (tvc.m_verifivation_failed) {
+			if (tvc.m_verification_failed) {
 				return make_error_code(CryptoNote::error::REQUEST_ERROR);
 			}
 
