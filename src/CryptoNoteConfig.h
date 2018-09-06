@@ -40,7 +40,7 @@ const size_t   DIFFICULTY_LAG                                = 15;
 static_assert(2 * DIFFICULTY_CUT <= DIFFICULTY_WINDOW - 2, "Bad DIFFICULTY_WINDOW or DIFFICULTY_CUT");
 
 const uint64_t DEPOSIT_MIN_AMOUNT                            = 25000 * COIN;
-const uint32_t DEPOSIT_MIN_TERM                              = 43800;
+const uint32_t DEPOSIT_MIN_TERM                              = 43200;
 const uint32_t DEPOSIT_MAX_TERM                              = DEPOSIT_MIN_TERM;
 const uint64_t DEPOSIT_MIN_TOTAL_RATE_FACTOR                 = 0;
 const uint64_t DEPOSIT_MAX_TOTAL_RATE                        = 1;
