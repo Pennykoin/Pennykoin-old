@@ -478,7 +478,7 @@ namespace {
 				return false;
 			}
 
-			auto xdnIt = rootIt->second[0].getObject().find("xdn");
+			auto xdnIt = rootIt->second[0].getObject().find("pk");
 			if (xdnIt == rootIt->second[0].getObject().end()) {
 				return false;
 			}
