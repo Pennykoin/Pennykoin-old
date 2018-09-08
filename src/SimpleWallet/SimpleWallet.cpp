@@ -611,7 +611,8 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
 	}
 
 	if (m_generate_new.empty() && m_wallet_file_arg.empty()) {
-		std::cout << "Choose from the following\n \n[O]pen existing wallet\n[G]enerate new wallet\n[I]mport from private key\n[E]xit.\n";
+		std::cout << "     ╔══════════════════════════════════════════════════════════╗\n     ║ [O]pen Address [G]enerate Address [I]mport Address [E]xit║\n     ╚══════════════════════════════════════════════════════════╝ ";
+		
 		char c;
 		do {
 			std::string answer;
