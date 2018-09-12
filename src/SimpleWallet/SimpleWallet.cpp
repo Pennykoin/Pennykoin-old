@@ -478,7 +478,7 @@ namespace {
 				return false;
 			}
 
-			auto xdnIt = rootIt->second[0].getObject().find("xdn");
+			auto xdnIt = rootIt->second[0].getObject().find("pk");
 			if (xdnIt == rootIt->second[0].getObject().end()) {
 				return false;
 			}
@@ -657,7 +657,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
 	if (!m_generate_new.empty() || !m_restore_new.empty()) {
 		std::string ignoredString;
 		if (!m_generate_new.empty()) {
-			WalletHelper::prepareFileNames(m_import_new, ignoredString, walletFileName);
+			WalletHelper::prepareFileNames(m_generate_new, ignoredString, walletFileName);
 		}
 		else if (!m_restore_new.empty()) {
 			WalletHelper::prepareFileNames(m_restore_new, ignoredString, walletFileName);

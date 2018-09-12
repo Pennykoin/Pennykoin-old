@@ -4,14 +4,14 @@
 #include <stdint.h>
 
 typedef struct {
-  uint32_t h[8], s[4], t[2];
-  int buflen, nullt;
-  uint8_t buf[64];
+	uint32_t h[8], s[4], t[2];
+	int buflen, nullt;
+	uint8_t buf[64];
 } state;
 
 typedef struct {
-  state inner;
-  state outer;
+	state inner;
+	state outer;
 } hmac_state;
 
 void blake256_init(state *);
