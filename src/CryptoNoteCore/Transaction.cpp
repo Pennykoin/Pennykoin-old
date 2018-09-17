@@ -8,6 +8,7 @@
 
 #include <boost/optional.hpp>
 #include <numeric>
+#include <memory>
 #include <unordered_set>
 
 using namespace Crypto;

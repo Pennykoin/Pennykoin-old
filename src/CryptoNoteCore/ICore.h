@@ -5,6 +5,8 @@
 #include <utility>
 #include <vector>
 #include <system_error>
+#include <memory>
+#include <iostream>
 
 #include <CryptoNote.h>
 #include "CryptoNoteCore/Difficulty.h"

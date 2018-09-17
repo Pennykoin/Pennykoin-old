@@ -1,5 +1,6 @@
 #include "TransactionExtra.h"
-
+#include <memory>
+#include <algorithm>
 #include "Common/int-util.h"
 #include "Common/MemoryInputStream.h"
 #include "Common/StreamTools.h"

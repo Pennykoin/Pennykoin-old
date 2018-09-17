@@ -1,6 +1,7 @@
 #include "ITransaction.h"
 
 #include <numeric>
+#include <memory>
 #include <system_error>
 
 #include "CryptoNoteCore/CryptoNoteBasic.h"

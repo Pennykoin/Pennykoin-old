@@ -1,3 +1,5 @@
+#include <map>
+#include <string>
 #include "TransfersContainer.h"
 #include "IWalletLegacy.h"
 #include "Common/StdInputStream.h"
@@ -238,7 +240,7 @@ namespace CryptoNote {
 			txInfo.paymentId = NULL_HASH;
 		}
 
-		auto result = m_transactions.emplace(std::move(txInfo));
+		auto result = m_transactions.insert(std::move(txInfo));
 		(void)result; // Disable unused warning
 		assert(result.second);
 	}
@@ -271,7 +273,7 @@ namespace CryptoNote {
 			info.visible = true;
 
 			if (transferIsUnconfirmed) {
-				auto result = m_unconfirmedTransfers.emplace(std::move(info));
+				auto result = m_unconfirmedTransfers.insert(std::move(info));
 				(void)result; // Disable unused warning
 				assert(result.second);
 			}
@@ -286,7 +288,7 @@ namespace CryptoNote {
 
 				addUnlockJob(info);
 
-				auto result = m_availableTransfers.emplace(std::move(info));
+				auto result = m_availableTransfers.insert(std::move(info));
 				(void)result; // Disable unused warning
 				assert(result.second);
 			}
@@ -441,7 +443,7 @@ namespace CryptoNote {
 
 			addUnlockJob(transfer);
 
-			auto result = m_availableTransfers.emplace(std::move(transfer));
+			auto result = m_availableTransfers.insert(std::move(transfer));
 			(void)result; // Disable unused warning
 			assert(result.second);
 
@@ -478,7 +480,7 @@ namespace CryptoNote {
 			const TransactionOutputInformationEx& unspendingTransfer = static_cast<const TransactionOutputInformationEx&>(*it);
 
 			addUnlockJob(unspendingTransfer);
-			auto result = m_availableTransfers.emplace(unspendingTransfer);
+			auto result = m_availableTransfers.insert(unspendingTransfer);
 			assert(result.second);
 			it = spendingTransactionIndex.erase(it);
 
@@ -528,7 +530,7 @@ namespace CryptoNote {
 		spentOutput.spendingBlock = block;
 		spentOutput.spendingTransactionHash = tx.getTransactionHash();
 		spentOutput.inputInTransaction = static_cast<uint32_t>(inputIndex);
-		auto result = m_spentTransfers.emplace(std::move(spentOutput));
+		auto result = m_spentTransfers.insert(std::move(spentOutput));
 		(void)result; // Disable unused warning
 		assert(result.second);
 	}
@@ -924,12 +926,12 @@ namespace CryptoNote {
 		const SpentTransfersMultiIndex& spentTransfers) {
 		for (auto it = availableTransfers.begin(); it != availableTransfers.end(); ++it) {
 			TransferUnlockJob job = makeTransferUnlockJob(*it, static_cast<uint32_t>(m_transactionSpendableAge));
-			transfersUnlockJobs.emplace(std::move(job));
+			transfersUnlockJobs.insert(std::move(job));
 		}
 
 		for (auto it = spentTransfers.begin(); it != spentTransfers.end(); ++it) {
 			TransferUnlockJob job = makeTransferUnlockJob(*it, static_cast<uint32_t>(m_transactionSpendableAge));
-			transfersUnlockJobs.emplace(std::move(job));
+			transfersUnlockJobs.insert(std::move(job));
 		}
 	}
 
@@ -986,7 +988,7 @@ namespace CryptoNote {
 	void TransfersContainer::addUnlockJob(const TransactionOutputInformationEx& output) {
 		TransferUnlockJob job = makeTransferUnlockJob(output, static_cast<uint32_t>(m_transactionSpendableAge));
 
-		auto r = m_transfersUnlockJobs.emplace(std::move(job));
+		auto r = m_transfersUnlockJobs.insert(std::move(job));
 		assert(r.second);
 	}
 

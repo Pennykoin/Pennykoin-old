@@ -9,6 +9,9 @@
 #include <functional>
 #include <system_error>
 #include <vector>
+#include <memory>
+#include <iostream>
+
 
 #include "crypto/crypto.h"
 #include "CryptoNoteCore/CryptoNoteBasic.h"
