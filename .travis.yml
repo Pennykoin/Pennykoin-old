@@ -1,7 +1,9 @@
   language: cpp
 
   group: stable
-
+  os: 
+     - osx
+     - linux
   dist: trusty
   addons:
     apt:
@@ -27,6 +29,4 @@
             - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CC=clang CXX=clang++; fi
   script:
             make
-  os: 
-     - osx
-     #- linux
+
