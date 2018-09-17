@@ -1,5 +1,9 @@
 # Pennykoin
 
+   Pennykoin is a private, secure cryptocurrency forked form digital/dark/ducknote.  There was no premine or ICO, all coins are emitted as mining rewards or interest.
+
+
+
 
 PK has been tested to compile on Windows 8-10 with VS2013, OSX High Sierra, Ubuntu 14-18, Solus, and EL7 ( must add elrepo & epel)
 
