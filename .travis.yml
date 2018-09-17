@@ -14,7 +14,6 @@
          - libssl-dev 
          - libzmq3-dev 
          - libunbound-dev 
-         - libsodium-dev 
          - libminiupnpc-dev 
          - libreadline6-dev 
          - libldns-dev
