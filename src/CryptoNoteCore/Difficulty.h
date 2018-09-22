@@ -1,8 +1,3 @@
-// Copyright (c) 2011-2016 The Cryptonote developers
-// Copyright (c) 2014-2016 SDN developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #pragma once
 
 #include <cstdint>
@@ -12,7 +7,7 @@
 
 namespace CryptoNote
 {
-    typedef std::uint64_t difficulty_type;
+	typedef std::uint64_t difficulty_type;
 
-    bool check_hash(const Crypto::Hash &hash, difficulty_type difficulty);
+	bool check_hash(const Crypto::Hash &hash, difficulty_type difficulty);
 }
