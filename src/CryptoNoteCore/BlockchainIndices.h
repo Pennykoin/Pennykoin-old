@@ -1,3 +1,8 @@
+// Copyright (c) 2011-2016 The Cryptonote developers
+// Copyright (c) 2014-2016 SDN developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #pragma once
 
 #include <string>
@@ -8,95 +13,97 @@
 #include "CryptoNoteBasic.h"
 
 namespace CryptoNote {
-	class ISerializer;
 
-	class PaymentIdIndex {
-	public:
-		PaymentIdIndex() = default;
+class ISerializer;
 
-		bool add(const Transaction& transaction);
-		bool remove(const Transaction& transaction);
-		bool find(const Crypto::Hash& paymentId, std::vector<Crypto::Hash>& transactionHashes);
-		void clear();
+class PaymentIdIndex {
+public:
+  PaymentIdIndex() = default;
 
-		void serialize(ISerializer& s);
+  bool add(const Transaction& transaction);
+  bool remove(const Transaction& transaction);
+  bool find(const Crypto::Hash& paymentId, std::vector<Crypto::Hash>& transactionHashes);
+  void clear();
 
-		template<class Archive>
-		void serialize(Archive& archive, unsigned int version) {
-			archive & index;
-		}
-	private:
-		std::unordered_multimap<Crypto::Hash, Crypto::Hash> index;
-	};
+  void serialize(ISerializer& s);
 
-	class TimestampBlocksIndex {
-	public:
-		TimestampBlocksIndex() = default;
+  template<class Archive> 
+  void serialize(Archive& archive, unsigned int version) {
+    archive & index;
+  }
+private:
+  std::unordered_multimap<Crypto::Hash, Crypto::Hash> index;
+};
 
-		bool add(uint64_t timestamp, const Crypto::Hash& hash);
-		bool remove(uint64_t timestamp, const Crypto::Hash& hash);
-		bool find(uint64_t timestampBegin, uint64_t timestampEnd, uint32_t hashesNumberLimit, std::vector<Crypto::Hash>& hashes, uint32_t& hashesNumberWithinTimestamps);
-		void clear();
+class TimestampBlocksIndex {
+public:
+  TimestampBlocksIndex() = default;
 
-		void serialize(ISerializer& s);
+  bool add(uint64_t timestamp, const Crypto::Hash& hash);
+  bool remove(uint64_t timestamp, const Crypto::Hash& hash);
+  bool find(uint64_t timestampBegin, uint64_t timestampEnd, uint32_t hashesNumberLimit, std::vector<Crypto::Hash>& hashes, uint32_t& hashesNumberWithinTimestamps);
+  void clear();
 
-		template<class Archive>
-		void serialize(Archive& archive, unsigned int version) {
-			archive & index;
-		}
-	private:
-		std::multimap<uint64_t, Crypto::Hash> index;
-	};
+  void serialize(ISerializer& s);
 
-	class TimestampTransactionsIndex {
-	public:
-		TimestampTransactionsIndex() = default;
+  template<class Archive> 
+  void serialize(Archive& archive, unsigned int version) {
+    archive & index;
+  }
+private:
+  std::multimap<uint64_t, Crypto::Hash> index;
+};
 
-		bool add(uint64_t timestamp, const Crypto::Hash& hash);
-		bool remove(uint64_t timestamp, const Crypto::Hash& hash);
-		bool find(uint64_t timestampBegin, uint64_t timestampEnd, uint64_t hashesNumberLimit, std::vector<Crypto::Hash>& hashes, uint64_t& hashesNumberWithinTimestamps);
-		void clear();
+class TimestampTransactionsIndex {
+public:
+  TimestampTransactionsIndex() = default;
 
-		void serialize(ISerializer& s);
+  bool add(uint64_t timestamp, const Crypto::Hash& hash);
+  bool remove(uint64_t timestamp, const Crypto::Hash& hash);
+  bool find(uint64_t timestampBegin, uint64_t timestampEnd, uint64_t hashesNumberLimit, std::vector<Crypto::Hash>& hashes, uint64_t& hashesNumberWithinTimestamps);
+  void clear();
 
-		template<class Archive>
-		void serialize(Archive& archive, unsigned int version) {
-			archive & index;
-		}
-	private:
-		std::multimap<uint64_t, Crypto::Hash> index;
-	};
+  void serialize(ISerializer& s);
 
-	class GeneratedTransactionsIndex {
-	public:
-		GeneratedTransactionsIndex();
+  template<class Archive>
+  void serialize(Archive& archive, unsigned int version) {
+    archive & index;
+  }
+private:
+  std::multimap<uint64_t, Crypto::Hash> index;
+};
 
-		bool add(const Block& block);
-		bool remove(const Block& block);
-		bool find(uint32_t height, uint64_t& generatedTransactions);
-		void clear();
+class GeneratedTransactionsIndex {
+public:
+  GeneratedTransactionsIndex();
 
-		void serialize(ISerializer& s);
+  bool add(const Block& block);
+  bool remove(const Block& block);
+  bool find(uint32_t height, uint64_t& generatedTransactions);
+  void clear();
 
-		template<class Archive>
-		void serialize(Archive& archive, unsigned int version) {
-			archive & index;
-			archive & lastGeneratedTxNumber;
-		}
-	private:
-		std::unordered_map<uint32_t, uint64_t> index;
-		uint64_t lastGeneratedTxNumber;
-	};
+  void serialize(ISerializer& s);
 
-	class OrphanBlocksIndex {
-	public:
-		OrphanBlocksIndex() = default;
+  template<class Archive> 
+  void serialize(Archive& archive, unsigned int version) {
+    archive & index;
+    archive & lastGeneratedTxNumber;
+  }
+private:
+  std::unordered_map<uint32_t, uint64_t> index;
+  uint64_t lastGeneratedTxNumber;
+};
 
-		bool add(const Block& block);
-		bool remove(const Block& block);
-		bool find(uint32_t height, std::vector<Crypto::Hash>& blockHashes);
-		void clear();
-	private:
-		std::unordered_multimap<uint32_t, Crypto::Hash> index;
-	};
+class OrphanBlocksIndex {
+public:
+  OrphanBlocksIndex() = default;
+
+  bool add(const Block& block);
+  bool remove(const Block& block);
+  bool find(uint32_t height, std::vector<Crypto::Hash>& blockHashes);
+  void clear();
+private:
+  std::unordered_multimap<uint32_t, Crypto::Hash> index;
+};
+
 }

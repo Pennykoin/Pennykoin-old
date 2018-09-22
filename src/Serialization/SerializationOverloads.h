@@ -1,3 +1,8 @@
+// Copyright (c) 2011-2016 The Cryptonote developers
+// Copyright (c) 2014-2016 SDN developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #pragma once
 
 #include "ISerializer.h"
@@ -15,230 +20,227 @@
 #include <unordered_set>
 
 namespace CryptoNote {
-	template<typename T>
-	typename std::enable_if<std::is_pod<T>::value>::type
-		serializeAsBinary(std::vector<T>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
-		std::string blob;
-		if (serializer.type() == ISerializer::INPUT) {
-			serializer.binary(blob, name);
-			value.resize(blob.size() / sizeof(T));
-			if (blob.size()) {
-				memcpy(&value[0], blob.data(), blob.size());
-			}
-		}
-		else {
-			if (!value.empty()) {
-				blob.assign(reinterpret_cast<const char*>(&value[0]), value.size() * sizeof(T));
-			}
-			serializer.binary(blob, name);
-		}
-	}
 
-	template<typename T>
-	typename std::enable_if<std::is_pod<T>::value>::type
-		serializeAsBinary(std::list<T>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
-		std::string blob;
-		if (serializer.type() == ISerializer::INPUT) {
-			serializer.binary(blob, name);
+template<typename T>
+typename std::enable_if<std::is_pod<T>::value>::type
+serializeAsBinary(std::vector<T>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
+  std::string blob;
+  if (serializer.type() == ISerializer::INPUT) {
+    serializer.binary(blob, name);
+    value.resize(blob.size() / sizeof(T));
+    if (blob.size()) {
+      memcpy(&value[0], blob.data(), blob.size());
+    }
+  } else {
+    if (!value.empty()) {
+      blob.assign(reinterpret_cast<const char*>(&value[0]), value.size() * sizeof(T));
+    }
+    serializer.binary(blob, name);
+  }
+}
 
-			size_t count = blob.size() / sizeof(T);
-			const T* ptr = reinterpret_cast<const T*>(blob.data());
+template<typename T>
+typename std::enable_if<std::is_pod<T>::value>::type
+serializeAsBinary(std::list<T>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
+  std::string blob;
+  if (serializer.type() == ISerializer::INPUT) {
+    serializer.binary(blob, name);
 
-			while (count--) {
-				value.push_back(*ptr++);
-			}
-		}
-		else {
-			if (!value.empty()) {
-				blob.resize(value.size() * sizeof(T));
-				T* ptr = reinterpret_cast<T*>(&blob[0]);
+    size_t count = blob.size() / sizeof(T);
+    const T* ptr = reinterpret_cast<const T*>(blob.data());
 
-				for (const auto& item : value) {
-					*ptr++ = item;
-				}
-			}
-			serializer.binary(blob, name);
-		}
-	}
+    while (count--) {
+      value.push_back(*ptr++);
+    }
+  } else {
+    if (!value.empty()) {
+      blob.resize(value.size() * sizeof(T));
+      T* ptr = reinterpret_cast<T*>(&blob[0]);
 
-	template <typename Cont>
-	bool serializeContainer(Cont& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
-		size_t size = value.size();
-		if (!serializer.beginArray(size, name)) {
-			value.clear();
-			return false;
-		}
+      for (const auto& item : value) {
+        *ptr++ = item;
+      }
+    }
+    serializer.binary(blob, name);
+  }
+}
 
-		value.resize(size);
+template <typename Cont>
+bool serializeContainer(Cont& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
+  size_t size = value.size();
+  if (!serializer.beginArray(size, name)) {
+    value.clear();
+    return false;
+  }
 
-		for (auto& item : value) {
-			serializer(const_cast<typename Cont::value_type&>(item), "");
-		}
+  value.resize(size);
 
-		serializer.endArray();
-		return true;
-	}
+  for (auto& item : value) {
+    serializer(const_cast<typename Cont::value_type&>(item), "");
+  }
 
-	template <typename E>
-	bool serializeEnumClass(E& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
-		static_assert(std::is_enum<E>::value, "E must be an enum class");
+  serializer.endArray();
+  return true;
+}
 
-		typedef typename std::underlying_type<E>::type EType;
+template <typename E>
+bool serializeEnumClass(E& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
+  static_assert(std::is_enum<E>::value, "E must be an enum class");
 
-		if (serializer.type() == CryptoNote::ISerializer::INPUT) {
-			EType numericValue;
-			serializer(numericValue, name);
-			value = static_cast<E>(numericValue);
-		}
-		else {
-			auto numericValue = static_cast<EType>(value);
-			serializer(numericValue, name);
-		}
+  typedef typename std::underlying_type<E>::type EType;
 
-		return true;
-	}
+  if (serializer.type() == CryptoNote::ISerializer::INPUT) {
+    EType numericValue;
+    serializer(numericValue, name);
+    value = static_cast<E>(numericValue);
+  } else {
+    auto numericValue = static_cast<EType>(value);
+    serializer(numericValue, name);
+  }
 
-	template<typename T>
-	bool serialize(std::vector<T>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
-		return serializeContainer(value, name, serializer);
-	}
+  return true;
+}
 
-	template<typename T>
-	bool serialize(std::list<T>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
-		return serializeContainer(value, name, serializer);
-	}
+template<typename T>
+bool serialize(std::vector<T>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
+  return serializeContainer(value, name, serializer);
+}
 
-	template<typename MapT, typename ReserveOp>
-	bool serializeMap(MapT& value, Common::StringView name, CryptoNote::ISerializer& serializer, ReserveOp reserve) {
-		size_t size = value.size();
+template<typename T>
+bool serialize(std::list<T>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
+  return serializeContainer(value, name, serializer);
+}
 
-		if (!serializer.beginArray(size, name)) {
-			value.clear();
-			return false;
-		}
+template<typename MapT, typename ReserveOp>
+bool serializeMap(MapT& value, Common::StringView name, CryptoNote::ISerializer& serializer, ReserveOp reserve) {
+  size_t size = value.size();
 
-		if (serializer.type() == CryptoNote::ISerializer::INPUT) {
-			reserve(size);
+  if (!serializer.beginArray(size, name)) {
+    value.clear();
+    return false;
+  }
 
-			for (size_t i = 0; i < size; ++i) {
-				typename MapT::key_type key;
-				typename MapT::mapped_type v;
+  if (serializer.type() == CryptoNote::ISerializer::INPUT) {
+    reserve(size);
 
-				serializer.beginObject("");
-				serializer(key, "key");
-				serializer(v, "value");
-				serializer.endObject();
+    for (size_t i = 0; i < size; ++i) {
+      typename MapT::key_type key;
+      typename MapT::mapped_type v;
 
-				value.insert(std::make_pair(std::move(key), std::move(v)));
-			}
-		}
-		else {
-			for (auto& kv : value) {
-				serializer.beginObject("");
-				serializer(const_cast<typename MapT::key_type&>(kv.first), "key");
-				serializer(kv.second, "value");
-				serializer.endObject();
-			}
-		}
+      serializer.beginObject("");
+      serializer(key, "key");
+      serializer(v, "value");
+      serializer.endObject();
 
-		serializer.endArray();
-		return true;
-	}
+      value.insert(std::make_pair(std::move(key), std::move(v)));
+    }
+  } else {
+    for (auto& kv : value) {
+      serializer.beginObject("");
+      serializer(const_cast<typename MapT::key_type&>(kv.first), "key");
+      serializer(kv.second, "value");
+      serializer.endObject();
+    }
+  }
 
-	template<typename SetT>
-	bool serializeSet(SetT& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
-		size_t size = value.size();
+  serializer.endArray();
+  return true;
+}
 
-		if (!serializer.beginArray(size, name)) {
-			value.clear();
-			return false;
-		}
+template<typename SetT>
+bool serializeSet(SetT& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
+  size_t size = value.size();
 
-		if (serializer.type() == CryptoNote::ISerializer::INPUT) {
-			for (size_t i = 0; i < size; ++i) {
-				typename SetT::value_type key;
-				serializer(key, "");
-				value.insert(std::move(key));
-			}
-		}
-		else {
-			for (auto& key : value) {
-				serializer(const_cast<typename SetT::value_type&>(key), "");
-			}
-		}
+  if (!serializer.beginArray(size, name)) {
+    value.clear();
+    return false;
+  }
 
-		serializer.endArray();
-		return true;
-	}
+  if (serializer.type() == CryptoNote::ISerializer::INPUT) {
+    for (size_t i = 0; i < size; ++i) {
+      typename SetT::value_type key;
+      serializer(key, "");
+      value.insert(std::move(key));
+    }
+  } else {
+    for (auto& key : value) {
+      serializer(const_cast<typename SetT::value_type&>(key), "");
+    }
+  }
 
-	template<typename K, typename Hash>
-	bool serialize(std::unordered_set<K, Hash>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
-		return serializeSet(value, name, serializer);
-	}
+  serializer.endArray();
+  return true;
+}
 
-	template<typename K, typename Cmp>
-	bool serialize(std::set<K, Cmp>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
-		return serializeSet(value, name, serializer);
-	}
+template<typename K, typename Hash>
+bool serialize(std::unordered_set<K, Hash>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
+  return serializeSet(value, name, serializer);
+}
 
-	template<typename K, typename V, typename Hash>
-	bool serialize(std::unordered_map<K, V, Hash>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
-		return serializeMap(value, name, serializer, [&value](size_t size) { value.reserve(size); });
-	}
+template<typename K, typename Cmp>
+bool serialize(std::set<K, Cmp>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
+  return serializeSet(value, name, serializer);
+}
 
-	template<typename K, typename V, typename Hash>
-	bool serialize(std::unordered_multimap<K, V, Hash>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
-		return serializeMap(value, name, serializer, [&value](size_t size) { value.reserve(size); });
-	}
+template<typename K, typename V, typename Hash>
+bool serialize(std::unordered_map<K, V, Hash>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
+  return serializeMap(value, name, serializer, [&value](size_t size) { value.reserve(size); });
+}
 
-	template<typename K, typename V, typename Hash>
-	bool serialize(std::map<K, V, Hash>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
-		return serializeMap(value, name, serializer, [](size_t size) {});
-	}
+template<typename K, typename V, typename Hash>
+bool serialize(std::unordered_multimap<K, V, Hash>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
+  return serializeMap(value, name, serializer, [&value](size_t size) { value.reserve(size); });
+}
 
-	template<typename K, typename V, typename Hash>
-	bool serialize(std::multimap<K, V, Hash>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
-		return serializeMap(value, name, serializer, [](size_t size) {});
-	}
+template<typename K, typename V, typename Hash>
+bool serialize(std::map<K, V, Hash>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
+  return serializeMap(value, name, serializer, [](size_t size) {});
+}
 
-	template<size_t size>
-	bool serialize(std::array<uint8_t, size>& value, Common::StringView name, CryptoNote::ISerializer& s) {
-		return s.binary(value.data(), value.size(), name);
-	}
+template<typename K, typename V, typename Hash>
+bool serialize(std::multimap<K, V, Hash>& value, Common::StringView name, CryptoNote::ISerializer& serializer) {
+  return serializeMap(value, name, serializer, [](size_t size) {});
+}
 
-	template <typename T1, typename T2>
-	void serialize(std::pair<T1, T2>& value, ISerializer& s) {
-		s(value.first, "first");
-		s(value.second, "second");
-	}
+template<size_t size>
+bool serialize(std::array<uint8_t, size>& value, Common::StringView name, CryptoNote::ISerializer& s) {
+  return s.binary(value.data(), value.size(), name);
+}
 
-	template <typename Element, typename Iterator>
-	void writeSequence(Iterator begin, Iterator end, Common::StringView name, ISerializer& s) {
-		size_t size = std::distance(begin, end);
-		s.beginArray(size, name);
-		for (Iterator i = begin; i != end; ++i) {
-			s(const_cast<Element&>(*i), "");
-		}
-		s.endArray();
-	}
+template <typename T1, typename T2> 
+void serialize(std::pair<T1, T2>& value, ISerializer& s) {
+  s(value.first, "first");
+  s(value.second, "second");
+}
 
-	template <typename Element, typename Iterator>
-	void readSequence(Iterator outputIterator, Common::StringView name, ISerializer& s) {
-		size_t size = 0;
-		s.beginArray(size, name);
+template <typename Element, typename Iterator>
+void writeSequence(Iterator begin, Iterator end, Common::StringView name, ISerializer& s) {
+  size_t size = std::distance(begin, end);
+  s.beginArray(size, name);
+  for (Iterator i = begin; i != end; ++i) {
+    s(const_cast<Element&>(*i), "");
+  }
+  s.endArray();
+}
 
-		while (size--) {
-			Element e;
-			s(e, "");
-			*outputIterator++ = std::move(e);
-		}
+template <typename Element, typename Iterator>
+void readSequence(Iterator outputIterator, Common::StringView name, ISerializer& s) {
+  size_t size = 0;
+  s.beginArray(size, name);
 
-		s.endArray();
-	}
+  while (size--) {
+    Element e;
+    s(e, "");
+    *outputIterator++ = std::move(e);
+  }
 
-	//convinience function since we change block height type
-	void serializeBlockHeight(ISerializer& s, uint32_t& blockHeight, Common::StringView name);
+  s.endArray();
+}
 
-	//convinience function since we change global output index type
-	void serializeGlobalOutputIndex(ISerializer& s, uint32_t& globalOutputIndex, Common::StringView name);
+//convinience function since we change block height type
+void serializeBlockHeight(ISerializer& s, uint32_t& blockHeight, Common::StringView name);
+
+//convinience function since we change global output index type
+void serializeGlobalOutputIndex(ISerializer& s, uint32_t& globalOutputIndex, Common::StringView name);
+
 }

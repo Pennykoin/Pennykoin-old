@@ -1,3 +1,8 @@
+// Copyright (c) 2011-2016 The Cryptonote developers
+// Copyright (c) 2014-2016 SDN developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include "WalletLegacySerializer.h"
 
 #include <stdexcept>
@@ -16,163 +21,165 @@
 using namespace Common;
 
 namespace {
-	const uint32_t WALLET_SERIALIZATION_VERSION = 2;
 
-	bool verifyKeys(const Crypto::SecretKey& sec, const Crypto::PublicKey& expected_pub) {
-		Crypto::PublicKey pub;
-		bool r = Crypto::secret_key_to_public_key(sec, pub);
-		return r && expected_pub == pub;
-	}
+const uint32_t WALLET_SERIALIZATION_VERSION = 2;
 
-	void throwIfKeysMissmatch(const Crypto::SecretKey& sec, const Crypto::PublicKey& expected_pub) {
-		if (!verifyKeys(sec, expected_pub))
-			throw std::system_error(make_error_code(CryptoNote::error::WRONG_PASSWORD));
-	}
+bool verifyKeys(const Crypto::SecretKey& sec, const Crypto::PublicKey& expected_pub) {
+  Crypto::PublicKey pub;
+  bool r = Crypto::secret_key_to_public_key(sec, pub);
+  return r && expected_pub == pub;
+}
+
+void throwIfKeysMissmatch(const Crypto::SecretKey& sec, const Crypto::PublicKey& expected_pub) {
+  if (!verifyKeys(sec, expected_pub))
+    throw std::system_error(make_error_code(CryptoNote::error::WRONG_PASSWORD));
+}
+
 }
 
 namespace CryptoNote {
-	WalletLegacySerializer::WalletLegacySerializer(CryptoNote::AccountBase& account, WalletUserTransactionsCache& transactionsCache) :
-		account(account),
-		transactionsCache(transactionsCache),
-		walletSerializationVersion(WALLET_SERIALIZATION_VERSION)
-	{
-	}
 
-	void WalletLegacySerializer::serialize(std::ostream& stream, const std::string& password, bool saveDetailed, const std::string& cache) {
-		std::stringstream plainArchive;
-		StdOutputStream plainStream(plainArchive);
-		CryptoNote::BinaryOutputStreamSerializer serializer(plainStream);
-		saveKeys(serializer);
+WalletLegacySerializer::WalletLegacySerializer(CryptoNote::AccountBase& account, WalletUserTransactionsCache& transactionsCache) :
+  account(account),
+  transactionsCache(transactionsCache),
+  walletSerializationVersion(WALLET_SERIALIZATION_VERSION)
+{
+}
 
-		serializer(saveDetailed, "has_details");
+void WalletLegacySerializer::serialize(std::ostream& stream, const std::string& password, bool saveDetailed, const std::string& cache) {
+  std::stringstream plainArchive;
+  StdOutputStream plainStream(plainArchive);
+  CryptoNote::BinaryOutputStreamSerializer serializer(plainStream);
+  saveKeys(serializer);
 
-		if (saveDetailed) {
-			serializer(transactionsCache, "details");
-		}
+  serializer(saveDetailed, "has_details");
 
-		serializer.binary(const_cast<std::string&>(cache), "cache");
+  if (saveDetailed) {
+    serializer(transactionsCache, "details");
+  }
 
-		std::string plain = plainArchive.str();
-		std::string cipher;
+  serializer.binary(const_cast<std::string&>(cache), "cache");
 
-		Crypto::chacha_iv iv = encrypt(plain, password, cipher);
+  std::string plain = plainArchive.str();
+  std::string cipher;
 
-		uint32_t version = walletSerializationVersion;
-		StdOutputStream output(stream);
-		CryptoNote::BinaryOutputStreamSerializer s(output);
-		s.beginObject("wallet");
-		s(version, "version");
-		s(iv, "iv");
-		s(cipher, "data");
-		s.endObject();
+  Crypto::chacha_iv iv = encrypt(plain, password, cipher);
 
-		stream.flush();
-	}
+  uint32_t version = walletSerializationVersion;
+  StdOutputStream output(stream);
+  CryptoNote::BinaryOutputStreamSerializer s(output);
+  s.beginObject("wallet");
+  s(version, "version");
+  s(iv, "iv");
+  s(cipher, "data");
+  s.endObject();
 
-	void WalletLegacySerializer::saveKeys(CryptoNote::ISerializer& serializer) {
-		CryptoNote::KeysStorage keys;
-		CryptoNote::AccountKeys acc = account.getAccountKeys();
+  stream.flush();
+}
 
-		keys.creationTimestamp = account.get_createtime();
-		keys.spendPublicKey = acc.address.spendPublicKey;
-		keys.spendSecretKey = acc.spendSecretKey;
-		keys.viewPublicKey = acc.address.viewPublicKey;
-		keys.viewSecretKey = acc.viewSecretKey;
+void WalletLegacySerializer::saveKeys(CryptoNote::ISerializer& serializer) {
+  CryptoNote::KeysStorage keys;
+  CryptoNote::AccountKeys acc = account.getAccountKeys();
 
-		keys.serialize(serializer, "keys");
-	}
+  keys.creationTimestamp = account.get_createtime();
+  keys.spendPublicKey = acc.address.spendPublicKey;
+  keys.spendSecretKey = acc.spendSecretKey;
+  keys.viewPublicKey = acc.address.viewPublicKey;
+  keys.viewSecretKey = acc.viewSecretKey;
 
-	Crypto::chacha_iv WalletLegacySerializer::encrypt(const std::string& plain, const std::string& password, std::string& cipher) {
-		Crypto::chacha_key key;
-		Crypto::cn_context context;
-		Crypto::generate_chacha8_key(context, password, key);
+  keys.serialize(serializer, "keys");
+}
 
-		cipher.resize(plain.size());
+Crypto::chacha_iv WalletLegacySerializer::encrypt(const std::string& plain, const std::string& password, std::string& cipher) {
+  Crypto::chacha_key key;
+  Crypto::cn_context context;
+  Crypto::generate_chacha8_key(context, password, key);
 
-		Crypto::chacha_iv iv = Crypto::rand<Crypto::chacha_iv>();
-		Crypto::chacha8(plain.data(), plain.size(), key, iv, &cipher[0]);
+  cipher.resize(plain.size());
 
-		return iv;
-	}
+  Crypto::chacha_iv iv = Crypto::rand<Crypto::chacha_iv>();
+  Crypto::chacha8(plain.data(), plain.size(), key, iv, &cipher[0]);
 
-	void WalletLegacySerializer::deserialize(std::istream& stream, const std::string& password, std::string& cache) {
-		StdInputStream stdStream(stream);
-		CryptoNote::BinaryInputStreamSerializer serializerEncrypted(stdStream);
+  return iv;
+}
 
-		serializerEncrypted.beginObject("wallet");
 
-		uint32_t version;
-		serializerEncrypted(version, "version");
+void WalletLegacySerializer::deserialize(std::istream& stream, const std::string& password, std::string& cache) {
+  StdInputStream stdStream(stream);
+  CryptoNote::BinaryInputStreamSerializer serializerEncrypted(stdStream);
 
-		Crypto::chacha_iv iv;
-		serializerEncrypted(iv, "iv");
+  serializerEncrypted.beginObject("wallet");
 
-		std::string cipher;
-		serializerEncrypted(cipher, "data");
+  uint32_t version;
+  serializerEncrypted(version, "version");
 
-		serializerEncrypted.endObject();
+  Crypto::chacha_iv iv;
+  serializerEncrypted(iv, "iv");
 
-		std::string plain;
-		decrypt(cipher, plain, iv, password);
+  std::string cipher;
+  serializerEncrypted(cipher, "data");
 
-		MemoryInputStream decryptedStream(plain.data(), plain.size());
-		CryptoNote::BinaryInputStreamSerializer serializer(decryptedStream);
+  serializerEncrypted.endObject();
 
-		loadKeys(serializer);
-		throwIfKeysMissmatch(account.getAccountKeys().viewSecretKey, account.getAccountKeys().address.viewPublicKey);
+  std::string plain;
+  decrypt(cipher, plain, iv, password);
 
-		if (account.getAccountKeys().spendSecretKey != NULL_SECRET_KEY) {
-			throwIfKeysMissmatch(account.getAccountKeys().spendSecretKey, account.getAccountKeys().address.spendPublicKey);
-		}
-		else {
-			if (!Crypto::check_key(account.getAccountKeys().address.spendPublicKey)) {
-				throw std::system_error(make_error_code(CryptoNote::error::WRONG_PASSWORD));
-			}
-		}
+  MemoryInputStream decryptedStream(plain.data(), plain.size()); 
+  CryptoNote::BinaryInputStreamSerializer serializer(decryptedStream);
 
-		bool detailsSaved;
+  loadKeys(serializer);
+  throwIfKeysMissmatch(account.getAccountKeys().viewSecretKey, account.getAccountKeys().address.viewPublicKey);
 
-		serializer(detailsSaved, "has_details");
+  if (account.getAccountKeys().spendSecretKey != NULL_SECRET_KEY) {
+    throwIfKeysMissmatch(account.getAccountKeys().spendSecretKey, account.getAccountKeys().address.spendPublicKey);
+  } else {
+    if (!Crypto::check_key(account.getAccountKeys().address.spendPublicKey)) {
+      throw std::system_error(make_error_code(CryptoNote::error::WRONG_PASSWORD));
+    }
+  }
 
-		if (detailsSaved) {
-			if (version == 1) {
-				transactionsCache.deserializeLegacyV1(serializer);
-			}
-			else {
-				serializer(transactionsCache, "details");
-			}
-		}
+  bool detailsSaved;
 
-		serializer.binary(cache, "cache");
-	}
+  serializer(detailsSaved, "has_details");
 
-	void WalletLegacySerializer::decrypt(const std::string& cipher, std::string& plain, Crypto::chacha_iv iv, const std::string& password) {
-		Crypto::chacha_key key;
-		Crypto::cn_context context;
-		Crypto::generate_chacha8_key(context, password, key);
+  if (detailsSaved) {
+    if (version == 1) {
+      transactionsCache.deserializeLegacyV1(serializer);
+    } else {
+      serializer(transactionsCache, "details");
+    }
+  }
 
-		plain.resize(cipher.size());
+  serializer.binary(cache, "cache");
+}
 
-		Crypto::chacha8(cipher.data(), cipher.size(), key, iv, &plain[0]);
-	}
+void WalletLegacySerializer::decrypt(const std::string& cipher, std::string& plain, Crypto::chacha_iv iv, const std::string& password) {
+  Crypto::chacha_key key;
+  Crypto::cn_context context;
+  Crypto::generate_chacha8_key(context, password, key);
 
-	void WalletLegacySerializer::loadKeys(CryptoNote::ISerializer& serializer) {
-		CryptoNote::KeysStorage keys;
+  plain.resize(cipher.size());
 
-		try {
-			keys.serialize(serializer, "keys");
-		}
-		catch (const std::runtime_error&) {
-			throw std::system_error(make_error_code(CryptoNote::error::WRONG_PASSWORD));
-		}
+  Crypto::chacha8(cipher.data(), cipher.size(), key, iv, &plain[0]);
+}
 
-		CryptoNote::AccountKeys acc;
-		acc.address.spendPublicKey = keys.spendPublicKey;
-		acc.spendSecretKey = keys.spendSecretKey;
-		acc.address.viewPublicKey = keys.viewPublicKey;
-		acc.viewSecretKey = keys.viewSecretKey;
+void WalletLegacySerializer::loadKeys(CryptoNote::ISerializer& serializer) {
+  CryptoNote::KeysStorage keys;
 
-		account.setAccountKeys(acc);
-		account.set_createtime(keys.creationTimestamp);
-	}
+  try {
+    keys.serialize(serializer, "keys");
+  } catch (const std::runtime_error&) {
+    throw std::system_error(make_error_code(CryptoNote::error::WRONG_PASSWORD));
+  }
+
+  CryptoNote::AccountKeys acc;
+  acc.address.spendPublicKey = keys.spendPublicKey;
+  acc.spendSecretKey = keys.spendSecretKey;
+  acc.address.viewPublicKey = keys.viewPublicKey;
+  acc.viewSecretKey = keys.viewSecretKey;
+
+  account.setAccountKeys(acc);
+  account.set_createtime(keys.creationTimestamp);
+}
+
 }

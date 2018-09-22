@@ -1,3 +1,8 @@
+// Copyright (c) 2011-2016 The Cryptonote developers
+// Copyright (c) 2014-2016 SDN developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #pragma once
 
 #include <algorithm>
@@ -7,41 +12,43 @@
 #include <Common/IOutputStream.h>
 
 namespace CryptoNote {
-	class MemoryStream : public Common::IOutputStream {
-	public:
 
-		MemoryStream() : m_writePos(0) {
-		}
+class MemoryStream: public Common::IOutputStream {
+public:
 
-		virtual size_t writeSome(const void* data, size_t size) override {
-			if (size == 0) {
-				return 0;
-			}
+  MemoryStream() : m_writePos(0) {
+  }
 
-			if (m_writePos + size > m_buffer.size()) {
-				m_buffer.resize(m_writePos + size);
-			}
+  virtual size_t writeSome(const void* data, size_t size) override {
+    if (size == 0) {
+      return 0;
+    }
 
-			memcpy(&m_buffer[m_writePos], data, size);
-			m_writePos += size;
-			return size;
-		}
+    if (m_writePos + size > m_buffer.size()) {
+      m_buffer.resize(m_writePos + size);
+    }
 
-		size_t size() {
-			return m_buffer.size();
-		}
+    memcpy(&m_buffer[m_writePos], data, size);
+    m_writePos += size;
+    return size;
+  }
 
-		const uint8_t* data() {
-			return m_buffer.data();
-		}
+  size_t size() {
+    return m_buffer.size();
+  }
 
-		void clear() {
-			m_writePos = 0;
-			m_buffer.resize(0);
-		}
+  const uint8_t* data() {
+    return m_buffer.data();
+  }
 
-	private:
-		size_t m_writePos;
-		std::vector<uint8_t> m_buffer;
-	};
+  void clear() {
+    m_writePos = 0;
+    m_buffer.resize(0);
+  }
+
+private:
+  size_t m_writePos;
+  std::vector<uint8_t> m_buffer;
+};
+
 }

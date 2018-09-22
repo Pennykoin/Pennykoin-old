@@ -1,30 +1,35 @@
+// Copyright (c) 2011-2016 The Cryptonote developers
+// Copyright (c) 2014-2016 SDN developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #pragma once
 
 #include <cstdint>
 
-namespace Common {
-	namespace Console {
-		enum class Color : uint8_t {
-			Default,
+namespace Common { namespace Console {
 
-			Blue,
-			Green,
-			Red,
-			Yellow,
-			White,
-			Cyan,
-			Magenta,
+enum class Color : uint8_t {
+  Default,
 
-			BrightBlue,
-			BrightGreen,
-			BrightRed,
-			BrightYellow,
-			BrightWhite,
-			BrightCyan,
-			BrightMagenta
-		};
+  Blue,
+  Green,
+  Red,
+  Yellow,
+  White,
+  Cyan,
+  Magenta,
 
-		void setTextColor(Color color);
-		bool isConsoleTty();
-	}
-}
+  BrightBlue,
+  BrightGreen,
+  BrightRed,
+  BrightYellow,
+  BrightWhite,
+  BrightCyan,
+  BrightMagenta
+};
+
+void setTextColor(Color color);
+bool isConsoleTty();
+
+}}

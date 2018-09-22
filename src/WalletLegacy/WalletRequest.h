@@ -1,3 +1,8 @@
+// Copyright (c) 2011-2016 The Cryptonote developers
+// Copyright (c) 2014-2016 SDN developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #pragma once
 
 #include "INode.h"
@@ -12,65 +17,67 @@
 #include <memory>
 
 namespace CryptoNote {
-	class WalletRequest
-	{
-	public:
-		typedef std::function<void(std::deque<std::unique_ptr<WalletLegacyEvent>>&, std::unique_ptr<WalletRequest>&, std::error_code)> Callback;
 
-		virtual ~WalletRequest() {};
+class WalletRequest
+{
+public:
+  typedef std::function<void(std::deque<std::unique_ptr<WalletLegacyEvent>>&, std::unique_ptr<WalletRequest>&, std::error_code)> Callback;
 
-		virtual void perform(INode& node, std::function<void(WalletRequest::Callback, std::error_code)> cb) = 0;
-	};
+  virtual ~WalletRequest() {};
 
-	class WalletGetRandomOutsByAmountsRequest : public WalletRequest
-	{
-	public:
-		WalletGetRandomOutsByAmountsRequest(const std::vector<uint64_t>& amounts, uint64_t outsCount, std::shared_ptr<SendTransactionContext> context, Callback cb) :
-			m_amounts(amounts), m_outsCount(outsCount), m_context(context), m_cb(cb) {};
+  virtual void perform(INode& node, std::function<void (WalletRequest::Callback, std::error_code)> cb) = 0;
+};
 
-		virtual ~WalletGetRandomOutsByAmountsRequest() {};
+class WalletGetRandomOutsByAmountsRequest: public WalletRequest
+{
+public:
+  WalletGetRandomOutsByAmountsRequest(const std::vector<uint64_t>& amounts, uint64_t outsCount, std::shared_ptr<SendTransactionContext> context, Callback cb) :
+    m_amounts(amounts), m_outsCount(outsCount), m_context(context), m_cb(cb) {};
 
-		virtual void perform(INode& node, std::function<void(WalletRequest::Callback, std::error_code)> cb) override
-		{
-			node.getRandomOutsByAmounts(std::move(m_amounts), m_outsCount, std::ref(m_context->outs), std::bind(cb, m_cb, std::placeholders::_1));
-		};
+  virtual ~WalletGetRandomOutsByAmountsRequest() {};
 
-	private:
-		std::vector<uint64_t> m_amounts;
-		uint64_t m_outsCount;
-		std::shared_ptr<SendTransactionContext> m_context;
-		Callback m_cb;
-	};
+  virtual void perform(INode& node, std::function<void (WalletRequest::Callback, std::error_code)> cb) override
+  {
+    node.getRandomOutsByAmounts(std::move(m_amounts), m_outsCount, std::ref(m_context->outs), std::bind(cb, m_cb, std::placeholders::_1));
+  };
 
-	class WalletRelayTransactionRequest : public WalletRequest
-	{
-	public:
-		WalletRelayTransactionRequest(const CryptoNote::Transaction& tx, Callback cb) : m_tx(tx), m_cb(cb) {};
-		virtual ~WalletRelayTransactionRequest() {};
+private:
+  std::vector<uint64_t> m_amounts;
+  uint64_t m_outsCount;
+  std::shared_ptr<SendTransactionContext> m_context;
+  Callback m_cb;
+};
 
-		virtual void perform(INode& node, std::function<void(WalletRequest::Callback, std::error_code)> cb) override
-		{
-			node.relayTransaction(m_tx, std::bind(cb, m_cb, std::placeholders::_1));
-		}
+class WalletRelayTransactionRequest: public WalletRequest
+{
+public:
+  WalletRelayTransactionRequest(const CryptoNote::Transaction& tx, Callback cb) : m_tx(tx), m_cb(cb) {};
+  virtual ~WalletRelayTransactionRequest() {};
 
-	private:
-		CryptoNote::Transaction m_tx;
-		Callback m_cb;
-	};
+  virtual void perform(INode& node, std::function<void (WalletRequest::Callback, std::error_code)> cb) override
+  {
+    node.relayTransaction(m_tx, std::bind(cb, m_cb, std::placeholders::_1));
+  }
 
-	class WalletRelayDepositTransactionRequest final : public WalletRequest
-	{
-	public:
-		WalletRelayDepositTransactionRequest(const Transaction& tx, Callback cb) : m_tx(tx), m_cb(cb) {}
-		virtual ~WalletRelayDepositTransactionRequest() {}
+private:
+  CryptoNote::Transaction m_tx;
+  Callback m_cb;
+};
 
-		virtual void perform(INode& node, std::function<void(WalletRequest::Callback, std::error_code)> cb)
-		{
-			node.relayTransaction(m_tx, std::bind(cb, m_cb, std::placeholders::_1));
-		}
+class WalletRelayDepositTransactionRequest final: public WalletRequest
+{
+public:
+  WalletRelayDepositTransactionRequest(const Transaction& tx, Callback cb) : m_tx(tx), m_cb(cb) {}
+  virtual ~WalletRelayDepositTransactionRequest() {}
 
-	private:
-		Transaction m_tx;
-		Callback m_cb;
-	};
+  virtual void perform(INode& node, std::function<void (WalletRequest::Callback, std::error_code)> cb)
+  {
+    node.relayTransaction(m_tx, std::bind(cb, m_cb, std::placeholders::_1));
+  }
+
+private:
+  Transaction m_tx;
+  Callback m_cb;
+};
+
 } //namespace CryptoNote

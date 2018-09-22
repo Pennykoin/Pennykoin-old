@@ -1,109 +1,118 @@
+// Copyright (c) 2011-2016 The Cryptonote developers
+// Copyright (c) 2014-2016 SDN developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include "P2pNodeConfig.h"
 #include "P2pNetworks.h"
 
 #include <CryptoNoteConfig.h>
 
 namespace CryptoNote {
-	namespace {
-		const std::chrono::nanoseconds P2P_DEFAULT_CONNECT_INTERVAL = std::chrono::seconds(2);
-		const size_t P2P_DEFAULT_CONNECT_RANGE = 20;
-		const size_t P2P_DEFAULT_PEERLIST_GET_TRY_COUNT = 10;
-	}
 
-	P2pNodeConfig::P2pNodeConfig() :
-		timedSyncInterval(std::chrono::seconds(P2P_DEFAULT_HANDSHAKE_INTERVAL)),
-		handshakeTimeout(std::chrono::milliseconds(P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT)),
-		connectInterval(P2P_DEFAULT_CONNECT_INTERVAL),
-		connectTimeout(std::chrono::milliseconds(P2P_DEFAULT_CONNECTION_TIMEOUT)),
-		networkId(CRYPTONOTE_NETWORK),
-		expectedOutgoingConnectionsCount(P2P_DEFAULT_CONNECTIONS_COUNT),
-		whiteListConnectionsPercent(P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT),
-		peerListConnectRange(P2P_DEFAULT_CONNECT_RANGE),
-		peerListGetTryCount(P2P_DEFAULT_PEERLIST_GET_TRY_COUNT) {
-	}
+namespace {
 
-	// getters
+const std::chrono::nanoseconds P2P_DEFAULT_CONNECT_INTERVAL = std::chrono::seconds(2);
+const size_t P2P_DEFAULT_CONNECT_RANGE = 20;
+const size_t P2P_DEFAULT_PEERLIST_GET_TRY_COUNT = 10;
 
-	std::chrono::nanoseconds P2pNodeConfig::getTimedSyncInterval() const {
-		return timedSyncInterval;
-	}
+}
 
-	std::chrono::nanoseconds P2pNodeConfig::getHandshakeTimeout() const {
-		return handshakeTimeout;
-	}
+P2pNodeConfig::P2pNodeConfig() :
+  timedSyncInterval(std::chrono::seconds(P2P_DEFAULT_HANDSHAKE_INTERVAL)),
+  handshakeTimeout(std::chrono::milliseconds(P2P_DEFAULT_HANDSHAKE_INVOKE_TIMEOUT)),
+  connectInterval(P2P_DEFAULT_CONNECT_INTERVAL),
+  connectTimeout(std::chrono::milliseconds(P2P_DEFAULT_CONNECTION_TIMEOUT)),
+  networkId(CRYPTONOTE_NETWORK),
+  expectedOutgoingConnectionsCount(P2P_DEFAULT_CONNECTIONS_COUNT),
+  whiteListConnectionsPercent(P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT),
+  peerListConnectRange(P2P_DEFAULT_CONNECT_RANGE),
+  peerListGetTryCount(P2P_DEFAULT_PEERLIST_GET_TRY_COUNT) {
+}
 
-	std::chrono::nanoseconds P2pNodeConfig::getConnectInterval() const {
-		return connectInterval;
-	}
+// getters
 
-	std::chrono::nanoseconds P2pNodeConfig::getConnectTimeout() const {
-		return connectTimeout;
-	}
+std::chrono::nanoseconds P2pNodeConfig::getTimedSyncInterval() const {
+  return timedSyncInterval;
+}
 
-	size_t P2pNodeConfig::getExpectedOutgoingConnectionsCount() const {
-		return expectedOutgoingConnectionsCount;
-	}
+std::chrono::nanoseconds P2pNodeConfig::getHandshakeTimeout() const {
+  return handshakeTimeout;
+}
 
-	size_t P2pNodeConfig::getWhiteListConnectionsPercent() const {
-		return whiteListConnectionsPercent;
-	}
+std::chrono::nanoseconds P2pNodeConfig::getConnectInterval() const {
+  return connectInterval;
+}
 
-	boost::uuids::uuid P2pNodeConfig::getNetworkId() const {
-		if (getTestnet()) {
-			boost::uuids::uuid copy = networkId;
-			copy.data[0] += 1;
-			return copy;
-		}
-		return networkId;
-	}
+std::chrono::nanoseconds P2pNodeConfig::getConnectTimeout() const {
+  return connectTimeout;
+}
 
-	size_t P2pNodeConfig::getPeerListConnectRange() const {
-		return peerListConnectRange;
-	}
+size_t P2pNodeConfig::getExpectedOutgoingConnectionsCount() const {
+  return expectedOutgoingConnectionsCount;
+}
 
-	size_t P2pNodeConfig::getPeerListGetTryCount() const {
-		return peerListGetTryCount;
-	}
+size_t P2pNodeConfig::getWhiteListConnectionsPercent() const {
+  return whiteListConnectionsPercent;
+}
 
-	// setters
+boost::uuids::uuid P2pNodeConfig::getNetworkId() const {
+  if (getTestnet()) {
+    boost::uuids::uuid copy = networkId;
+    copy.data[0] += 1;
+    return copy;
+  }
+  return networkId;
+}
 
-	void P2pNodeConfig::setTimedSyncInterval(std::chrono::nanoseconds interval) {
-		timedSyncInterval = interval;
-	}
+size_t P2pNodeConfig::getPeerListConnectRange() const {
+  return peerListConnectRange;
+}
 
-	void P2pNodeConfig::setHandshakeTimeout(std::chrono::nanoseconds timeout) {
-		handshakeTimeout = timeout;
-	}
+size_t P2pNodeConfig::getPeerListGetTryCount() const {
+  return peerListGetTryCount;
+}
 
-	void P2pNodeConfig::setConnectInterval(std::chrono::nanoseconds interval) {
-		connectInterval = interval;
-	}
+// setters
 
-	void P2pNodeConfig::setConnectTimeout(std::chrono::nanoseconds timeout) {
-		connectTimeout = timeout;
-	}
+void P2pNodeConfig::setTimedSyncInterval(std::chrono::nanoseconds interval) {
+  timedSyncInterval = interval;
+}
 
-	void P2pNodeConfig::setExpectedOutgoingConnectionsCount(size_t count) {
-		expectedOutgoingConnectionsCount = count;
-	}
+void P2pNodeConfig::setHandshakeTimeout(std::chrono::nanoseconds timeout) {
+  handshakeTimeout = timeout;
+}
 
-	void P2pNodeConfig::setWhiteListConnectionsPercent(size_t percent) {
-		if (percent > 100) {
-			throw std::invalid_argument("whiteListConnectionsPercent cannot be greater than 100");
-		}
+void P2pNodeConfig::setConnectInterval(std::chrono::nanoseconds interval) {
+  connectInterval = interval;
+}
 
-		whiteListConnectionsPercent = percent;
-	}
+void P2pNodeConfig::setConnectTimeout(std::chrono::nanoseconds timeout) {
+  connectTimeout = timeout;
+}
 
-	void P2pNodeConfig::setNetworkId(const boost::uuids::uuid& id) {
-		networkId = id;
-	}
+void P2pNodeConfig::setExpectedOutgoingConnectionsCount(size_t count) {
+  expectedOutgoingConnectionsCount = count;
+}
 
-	void P2pNodeConfig::setPeerListConnectRange(size_t range) {
-		peerListConnectRange = range;
-	}
+void P2pNodeConfig::setWhiteListConnectionsPercent(size_t percent) {
+  if (percent > 100) {
+    throw std::invalid_argument("whiteListConnectionsPercent cannot be greater than 100");
+  }
 
-	void P2pNodeConfig::setPeerListGetTryCount(size_t count) {
-		peerListGetTryCount = count;
-	}
+  whiteListConnectionsPercent = percent;
+}
+
+void P2pNodeConfig::setNetworkId(const boost::uuids::uuid& id) {
+  networkId = id;
+}
+
+void P2pNodeConfig::setPeerListConnectRange(size_t range) {
+  peerListConnectRange = range;
+}
+
+void P2pNodeConfig::setPeerListGetTryCount(size_t count) {
+  peerListGetTryCount = count;
+}
+
 }
