@@ -1,3 +1,8 @@
+// Copyright (c) 2011-2016 The Cryptonote developers
+// Copyright (c) 2014-2016 SDN developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #pragma once
 
 #include "IWalletLegacy.h"
@@ -5,155 +10,157 @@
 
 namespace CryptoNote
 {
-	class WalletLegacyEvent
-	{
-	public:
-		virtual ~WalletLegacyEvent() {
-		};
 
-		virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) = 0;
-	};
+class WalletLegacyEvent
+{
+public:
+  virtual ~WalletLegacyEvent() {
+  };
 
-	class WalletTransactionUpdatedEvent : public WalletLegacyEvent
-	{
-	public:
-		WalletTransactionUpdatedEvent(TransactionId transactionId) : m_id(transactionId) {};
-		virtual ~WalletTransactionUpdatedEvent() {};
+  virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) = 0;
+};
 
-		virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) override
-		{
-			observer.notify(&IWalletLegacyObserver::transactionUpdated, m_id);
-		}
+class WalletTransactionUpdatedEvent : public WalletLegacyEvent
+{
+public:
+  WalletTransactionUpdatedEvent(TransactionId transactionId) : m_id(transactionId) {};
+  virtual ~WalletTransactionUpdatedEvent() {};
 
-	private:
-		TransactionId m_id;
-	};
+  virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) override
+  {
+    observer.notify(&IWalletLegacyObserver::transactionUpdated, m_id);
+  }
 
-	class WalletSendTransactionCompletedEvent : public WalletLegacyEvent
-	{
-	public:
-		WalletSendTransactionCompletedEvent(TransactionId transactionId, std::error_code result) : m_id(transactionId), m_error(result) {};
-		virtual ~WalletSendTransactionCompletedEvent() {};
+private:
+  TransactionId m_id;
+};
 
-		virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) override
-		{
-			observer.notify(&IWalletLegacyObserver::sendTransactionCompleted, m_id, m_error);
-		}
+class WalletSendTransactionCompletedEvent : public WalletLegacyEvent
+{
+public:
+  WalletSendTransactionCompletedEvent(TransactionId transactionId, std::error_code result) : m_id(transactionId), m_error(result) {};
+  virtual ~WalletSendTransactionCompletedEvent() {};
 
-	private:
-		TransactionId m_id;
-		std::error_code m_error;
-	};
+  virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) override
+  {
+    observer.notify(&IWalletLegacyObserver::sendTransactionCompleted, m_id, m_error);
+  }
 
-	class WalletExternalTransactionCreatedEvent : public WalletLegacyEvent
-	{
-	public:
-		WalletExternalTransactionCreatedEvent(TransactionId transactionId) : m_id(transactionId) {};
-		virtual ~WalletExternalTransactionCreatedEvent() {};
+private:
+  TransactionId m_id;
+  std::error_code m_error;
+};
 
-		virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) override
-		{
-			observer.notify(&IWalletLegacyObserver::externalTransactionCreated, m_id);
-		}
-	private:
-		TransactionId m_id;
-	};
+class WalletExternalTransactionCreatedEvent : public WalletLegacyEvent
+{
+public:
+  WalletExternalTransactionCreatedEvent(TransactionId transactionId) : m_id(transactionId) {};
+  virtual ~WalletExternalTransactionCreatedEvent() {};
 
-	class WalletDepositsUpdatedEvent : public WalletLegacyEvent {
-	public:
-		WalletDepositsUpdatedEvent(std::vector<DepositId>&& depositIds) : updatedDeposits(depositIds) {}
+  virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) override
+  {
+    observer.notify(&IWalletLegacyObserver::externalTransactionCreated, m_id);
+  }
+private:
+  TransactionId m_id;
+};
 
-		virtual ~WalletDepositsUpdatedEvent() {}
+class WalletDepositsUpdatedEvent : public WalletLegacyEvent {
+public:
+  WalletDepositsUpdatedEvent(std::vector<DepositId>&& depositIds) : updatedDeposits(depositIds) {}
 
-		virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) override {
-			observer.notify(&IWalletLegacyObserver::depositsUpdated, updatedDeposits);
-		}
-	private:
-		std::vector<DepositId> updatedDeposits;
-	};
+  virtual ~WalletDepositsUpdatedEvent() {}
 
-	class WalletSynchronizationProgressUpdatedEvent : public WalletLegacyEvent
-	{
-	public:
-		WalletSynchronizationProgressUpdatedEvent(uint32_t current, uint32_t total) : m_current(current), m_total(total) {};
-		virtual ~WalletSynchronizationProgressUpdatedEvent() {};
+  virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) override {
+    observer.notify(&IWalletLegacyObserver::depositsUpdated, updatedDeposits);
+  }
+private:
+  std::vector<DepositId> updatedDeposits;
+};
 
-		virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) override
-		{
-			observer.notify(&IWalletLegacyObserver::synchronizationProgressUpdated, m_current, m_total);
-		}
+class WalletSynchronizationProgressUpdatedEvent : public WalletLegacyEvent
+{
+public:
+  WalletSynchronizationProgressUpdatedEvent(uint32_t current, uint32_t total) : m_current(current), m_total(total) {};
+  virtual ~WalletSynchronizationProgressUpdatedEvent() {};
 
-	private:
-		uint32_t m_current;
-		uint32_t m_total;
-	};
+  virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) override
+  {
+    observer.notify(&IWalletLegacyObserver::synchronizationProgressUpdated, m_current, m_total);
+  }
 
-	class WalletSynchronizationCompletedEvent : public WalletLegacyEvent {
-	public:
-		WalletSynchronizationCompletedEvent(uint32_t current, uint32_t total, std::error_code result) : m_ec(result) {};
-		virtual ~WalletSynchronizationCompletedEvent() {};
+private:
+  uint32_t m_current;
+  uint32_t m_total;
+};
 
-		virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) override {
-			observer.notify(&IWalletLegacyObserver::synchronizationCompleted, m_ec);
-		}
+class WalletSynchronizationCompletedEvent : public WalletLegacyEvent {
+public:
+  WalletSynchronizationCompletedEvent(uint32_t current, uint32_t total, std::error_code result) : m_ec(result) {};
+  virtual ~WalletSynchronizationCompletedEvent() {};
 
-	private:
-		std::error_code m_ec;
-	};
+  virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) override {
+    observer.notify(&IWalletLegacyObserver::synchronizationCompleted, m_ec);
+  }
 
-	class WalletActualBalanceUpdatedEvent : public WalletLegacyEvent
-	{
-	public:
-		WalletActualBalanceUpdatedEvent(uint64_t balance) : m_balance(balance) {};
-		virtual ~WalletActualBalanceUpdatedEvent() {};
+private:
+  std::error_code m_ec;
+};
 
-		virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) override
-		{
-			observer.notify(&IWalletLegacyObserver::actualBalanceUpdated, m_balance);
-		}
-	private:
-		uint64_t m_balance;
-	};
+class WalletActualBalanceUpdatedEvent : public WalletLegacyEvent
+{
+public:
+  WalletActualBalanceUpdatedEvent(uint64_t balance) : m_balance(balance) {};
+  virtual ~WalletActualBalanceUpdatedEvent() {};
 
-	class WalletPendingBalanceUpdatedEvent : public WalletLegacyEvent
-	{
-	public:
-		WalletPendingBalanceUpdatedEvent(uint64_t balance) : m_balance(balance) {};
-		virtual ~WalletPendingBalanceUpdatedEvent() {};
+  virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) override
+  {
+    observer.notify(&IWalletLegacyObserver::actualBalanceUpdated, m_balance);
+  }
+private:
+  uint64_t m_balance;
+};
 
-		virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) override
-		{
-			observer.notify(&IWalletLegacyObserver::pendingBalanceUpdated, m_balance);
-		}
-	private:
-		uint64_t m_balance;
-	};
+class WalletPendingBalanceUpdatedEvent : public WalletLegacyEvent
+{
+public:
+  WalletPendingBalanceUpdatedEvent(uint64_t balance) : m_balance(balance) {};
+  virtual ~WalletPendingBalanceUpdatedEvent() {};
 
-	class WalletActualDepositBalanceUpdatedEvent : public WalletLegacyEvent
-	{
-	public:
-		WalletActualDepositBalanceUpdatedEvent(uint64_t balance) : m_balance(balance) {}
-		virtual ~WalletActualDepositBalanceUpdatedEvent() {}
+  virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer) override
+  {
+    observer.notify(&IWalletLegacyObserver::pendingBalanceUpdated, m_balance);
+  }
+private:
+  uint64_t m_balance;
+};
 
-		virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer)
-		{
-			observer.notify(&IWalletLegacyObserver::actualDepositBalanceUpdated, m_balance);
-		}
-	private:
-		uint64_t m_balance;
-	};
+class WalletActualDepositBalanceUpdatedEvent : public WalletLegacyEvent
+{
+public:
+  WalletActualDepositBalanceUpdatedEvent(uint64_t balance) : m_balance(balance) {}
+  virtual ~WalletActualDepositBalanceUpdatedEvent() {}
 
-	class WalletPendingDepositBalanceUpdatedEvent : public WalletLegacyEvent
-	{
-	public:
-		WalletPendingDepositBalanceUpdatedEvent(uint64_t balance) : m_balance(balance) {}
-		virtual ~WalletPendingDepositBalanceUpdatedEvent() {}
+  virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer)
+  {
+    observer.notify(&IWalletLegacyObserver::actualDepositBalanceUpdated, m_balance);
+  }
+private:
+  uint64_t m_balance;
+};
 
-		virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer)
-		{
-			observer.notify(&IWalletLegacyObserver::pendingDepositBalanceUpdated, m_balance);
-		}
-	private:
-		uint64_t m_balance;
-	};
+class WalletPendingDepositBalanceUpdatedEvent : public WalletLegacyEvent
+{
+public:
+  WalletPendingDepositBalanceUpdatedEvent(uint64_t balance) : m_balance(balance) {}
+  virtual ~WalletPendingDepositBalanceUpdatedEvent() {}
+
+  virtual void notify(Tools::ObserverManager<CryptoNote::IWalletLegacyObserver>& observer)
+  {
+    observer.notify(&IWalletLegacyObserver::pendingDepositBalanceUpdated, m_balance);
+  }
+private:
+  uint64_t m_balance;
+};
+
 } /* namespace CryptoNote */

@@ -1,3 +1,8 @@
+// Copyright (c) 2011-2016 The Cryptonote developers
+// Copyright (c) 2014-2016 SDN developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #pragma once
 
 #include "IWalletLegacy.h"
@@ -13,89 +18,95 @@
 #include "WalletLegacy/WalletUnconfirmedTransactions.h"
 
 namespace CryptoNote {
-	class ISerializer;
+class ISerializer;
 
-	typedef std::pair<Crypto::PublicKey, size_t> TransactionOutputId;
+typedef std::pair<Crypto::PublicKey, size_t> TransactionOutputId;
 }
 
 namespace std {
-	template<>
-	struct hash<CryptoNote::TransactionOutputId> {
-		size_t operator()(const CryptoNote::TransactionOutputId &_v) const {
-			return hash<Crypto::PublicKey>()(_v.first) ^ _v.second;
-		}
-	};
+
+template<> 
+struct hash<CryptoNote::TransactionOutputId> {
+  size_t operator()(const CryptoNote::TransactionOutputId &_v) const {    
+    return hash<Crypto::PublicKey>()(_v.first) ^ _v.second;
+  } 
+}; 
+
 }
 
 namespace CryptoNote {
-	struct UnconfirmedTransferDetails {
-		UnconfirmedTransferDetails() :
-			amount(0), sentTime(0), transactionId(WALLET_LEGACY_INVALID_TRANSACTION_ID) {}
 
-		CryptoNote::Transaction tx;
-		uint64_t amount;
-		uint64_t outsAmount;
-		time_t sentTime;
-		TransactionId transactionId;
-		std::vector<TransactionOutputId> usedOutputs;
-	};
 
-	struct UnconfirmedSpentDepositDetails {
-		TransactionId transactionId;
-		uint64_t depositsSum;
-		uint64_t fee;
-	};
+struct UnconfirmedTransferDetails {
 
-	class WalletUnconfirmedTransactions
-	{
-	public:
+  UnconfirmedTransferDetails() :
+    amount(0), sentTime(0), transactionId(WALLET_LEGACY_INVALID_TRANSACTION_ID) {}
 
-		explicit WalletUnconfirmedTransactions(uint64_t uncofirmedTransactionsLiveTime);
+  CryptoNote::Transaction tx;
+  uint64_t amount;
+  uint64_t outsAmount;
+  time_t sentTime;
+  TransactionId transactionId;
+  std::vector<TransactionOutputId> usedOutputs;
+};
 
-		bool serialize(CryptoNote::ISerializer& s);
-		bool deserializeV1(CryptoNote::ISerializer& s);
+struct UnconfirmedSpentDepositDetails {
+  TransactionId transactionId;
+  uint64_t depositsSum;
+  uint64_t fee;
+};
 
-		bool findTransactionId(const Crypto::Hash& hash, TransactionId& id);
-		void erase(const Crypto::Hash& hash);
-		void add(const CryptoNote::Transaction& tx, TransactionId transactionId,
-			uint64_t amount, const std::vector<TransactionOutputInformation>& usedOutputs);
-		void updateTransactionId(const Crypto::Hash& hash, TransactionId id);
+class WalletUnconfirmedTransactions
+{
+public:
 
-		void addCreatedDeposit(DepositId id, uint64_t totalAmount);
-		void addDepositSpendingTransaction(const Crypto::Hash& transactionHash, const UnconfirmedSpentDepositDetails& details);
+  explicit WalletUnconfirmedTransactions(uint64_t uncofirmedTransactionsLiveTime);
 
-		void eraseCreatedDeposit(DepositId id);
+  bool serialize(CryptoNote::ISerializer& s);
+  bool deserializeV1(CryptoNote::ISerializer& s);
 
-		uint64_t countCreatedDepositsSum() const;
-		uint64_t countSpentDepositsProfit() const;
-		uint64_t countSpentDepositsTotalAmount() const;
+  bool findTransactionId(const Crypto::Hash& hash, TransactionId& id);
+  void erase(const Crypto::Hash& hash);
+  void add(const CryptoNote::Transaction& tx, TransactionId transactionId, 
+    uint64_t amount, const std::vector<TransactionOutputInformation>& usedOutputs);
+  void updateTransactionId(const Crypto::Hash& hash, TransactionId id);
 
-		uint64_t countUnconfirmedOutsAmount() const;
-		uint64_t countUnconfirmedTransactionsAmount() const;
-		bool isUsed(const TransactionOutputInformation& out) const;
-		void reset();
+  void addCreatedDeposit(DepositId id, uint64_t totalAmount);
+  void addDepositSpendingTransaction(const Crypto::Hash& transactionHash, const UnconfirmedSpentDepositDetails& details);
 
-		std::vector<TransactionId> deleteOutdatedTransactions();
+  void eraseCreatedDeposit(DepositId id);
 
-	private:
+  uint64_t countCreatedDepositsSum() const;
+  uint64_t countSpentDepositsProfit() const;
+  uint64_t countSpentDepositsTotalAmount() const;
 
-		void collectUsedOutputs();
-		void deleteUsedOutputs(const std::vector<TransactionOutputId>& usedOutputs);
+  uint64_t countUnconfirmedOutsAmount() const;
+  uint64_t countUnconfirmedTransactionsAmount() const;
+  bool isUsed(const TransactionOutputInformation& out) const;
+  void reset();
 
-		bool eraseUnconfirmedTransaction(const Crypto::Hash& hash);
-		bool eraseDepositSpendingTransaction(const Crypto::Hash& hash);
+  std::vector<TransactionId> deleteOutdatedTransactions();
 
-		bool findUnconfirmedTransactionId(const Crypto::Hash& hash, TransactionId& id);
-		bool findUnconfirmedDepositSpendingTransactionId(const Crypto::Hash& hash, TransactionId& id);
+private:
 
-		typedef std::unordered_map<Crypto::Hash, UnconfirmedTransferDetails, boost::hash<Crypto::Hash>> UnconfirmedTxsContainer;
-		typedef std::unordered_set<TransactionOutputId> UsedOutputsContainer;
+  void collectUsedOutputs();
+  void deleteUsedOutputs(const std::vector<TransactionOutputId>& usedOutputs);
 
-		UnconfirmedTxsContainer m_unconfirmedTxs;
-		UsedOutputsContainer m_usedOutputs;
-		uint64_t m_uncofirmedTransactionsLiveTime;
+  bool eraseUnconfirmedTransaction(const Crypto::Hash& hash);
+  bool eraseDepositSpendingTransaction(const Crypto::Hash& hash);
 
-		std::unordered_map<DepositId, uint64_t> m_createdDeposits;
-		std::unordered_map<Crypto::Hash, UnconfirmedSpentDepositDetails> m_spentDeposits;
-	};
+  bool findUnconfirmedTransactionId(const Crypto::Hash& hash, TransactionId& id);
+  bool findUnconfirmedDepositSpendingTransactionId(const Crypto::Hash& hash, TransactionId& id);
+
+  typedef std::unordered_map<Crypto::Hash, UnconfirmedTransferDetails, boost::hash<Crypto::Hash>> UnconfirmedTxsContainer;
+  typedef std::unordered_set<TransactionOutputId> UsedOutputsContainer;
+
+  UnconfirmedTxsContainer m_unconfirmedTxs;
+  UsedOutputsContainer m_usedOutputs;
+  uint64_t m_uncofirmedTransactionsLiveTime;
+
+  std::unordered_map<DepositId, uint64_t> m_createdDeposits;
+  std::unordered_map<Crypto::Hash, UnconfirmedSpentDepositDetails> m_spentDeposits;
+};
+
 } // namespace CryptoNote

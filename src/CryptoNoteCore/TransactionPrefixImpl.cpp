@@ -1,7 +1,11 @@
+// Copyright (c) 2011-2016 The Cryptonote developers
+// Copyright (c) 2014-2016 SDN developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include "ITransaction.h"
 
 #include <numeric>
-#include <memory>
 #include <system_error>
 
 #include "CryptoNoteCore/CryptoNoteBasic.h"
@@ -12,197 +16,200 @@
 using namespace Crypto;
 
 namespace CryptoNote {
-	class TransactionPrefixImpl : public ITransactionReader {
-	public:
-		TransactionPrefixImpl();
-		TransactionPrefixImpl(const TransactionPrefix& prefix, const Hash& transactionHash);
 
-		virtual ~TransactionPrefixImpl() { }
+class TransactionPrefixImpl : public ITransactionReader {
+public:
+  TransactionPrefixImpl();
+  TransactionPrefixImpl(const TransactionPrefix& prefix, const Hash& transactionHash);
 
-		virtual Hash getTransactionHash() const override;
-		virtual Hash getTransactionPrefixHash() const override;
-		virtual PublicKey getTransactionPublicKey() const override;
-		virtual uint64_t getUnlockTime() const override;
+  virtual ~TransactionPrefixImpl() { }
 
-		// extra
-		virtual bool getPaymentId(Hash& paymentId) const override;
-		virtual bool getExtraNonce(BinaryArray& nonce) const override;
-		virtual BinaryArray getExtra() const override;
+  virtual Hash getTransactionHash() const override;
+  virtual Hash getTransactionPrefixHash() const override;
+  virtual PublicKey getTransactionPublicKey() const override;
+  virtual uint64_t getUnlockTime() const override;
 
-		// inputs
-		virtual size_t getInputCount() const override;
-		virtual uint64_t getInputTotalAmount() const override;
-		virtual TransactionTypes::InputType getInputType(size_t index) const override;
-		virtual void getInput(size_t index, KeyInput& input) const override;
-		virtual void getInput(size_t index, MultisignatureInput& input) const override;
+  // extra
+  virtual bool getPaymentId(Hash& paymentId) const override;
+  virtual bool getExtraNonce(BinaryArray& nonce) const override;
+  virtual BinaryArray getExtra() const override;
 
-		// outputs
-		virtual size_t getOutputCount() const override;
-		virtual uint64_t getOutputTotalAmount() const override;
-		virtual TransactionTypes::OutputType getOutputType(size_t index) const override;
-		virtual void getOutput(size_t index, KeyOutput& output, uint64_t& amount) const override;
-		virtual void getOutput(size_t index, MultisignatureOutput& output, uint64_t& amount) const override;
+  // inputs
+  virtual size_t getInputCount() const override;
+  virtual uint64_t getInputTotalAmount() const override;
+  virtual TransactionTypes::InputType getInputType(size_t index) const override;
+  virtual void getInput(size_t index, KeyInput& input) const override;
+  virtual void getInput(size_t index, MultisignatureInput& input) const override;
 
-		// signatures
-		virtual size_t getRequiredSignaturesCount(size_t inputIndex) const override;
-		virtual bool findOutputsToAccount(const AccountPublicAddress& addr, const SecretKey& viewSecretKey, std::vector<uint32_t>& outs, uint64_t& outputAmount) const override;
+  // outputs
+  virtual size_t getOutputCount() const override;
+  virtual uint64_t getOutputTotalAmount() const override;
+  virtual TransactionTypes::OutputType getOutputType(size_t index) const override;
+  virtual void getOutput(size_t index, KeyOutput& output, uint64_t& amount) const override;
+  virtual void getOutput(size_t index, MultisignatureOutput& output, uint64_t& amount) const override;
 
-		// various checks
-		virtual bool validateInputs() const override;
-		virtual bool validateOutputs() const override;
-		virtual bool validateSignatures() const override;
+  // signatures
+  virtual size_t getRequiredSignaturesCount(size_t inputIndex) const override;
+  virtual bool findOutputsToAccount(const AccountPublicAddress& addr, const SecretKey& viewSecretKey, std::vector<uint32_t>& outs, uint64_t& outputAmount) const override;
 
-		// serialized transaction
-		virtual BinaryArray getTransactionData() const override;
+  // various checks
+  virtual bool validateInputs() const override;
+  virtual bool validateOutputs() const override;
+  virtual bool validateSignatures() const override;
 
-		virtual bool getTransactionSecretKey(SecretKey& key) const override;
+  // serialized transaction
+  virtual BinaryArray getTransactionData() const override;
 
-	private:
-		TransactionPrefix m_txPrefix;
-		TransactionExtra m_extra;
-		Hash m_txHash;
-	};
+  virtual bool getTransactionSecretKey(SecretKey& key) const override;
 
-	TransactionPrefixImpl::TransactionPrefixImpl() {
-	}
+private:
+  TransactionPrefix m_txPrefix;
+  TransactionExtra m_extra;
+  Hash m_txHash;
+};
 
-	TransactionPrefixImpl::TransactionPrefixImpl(const TransactionPrefix& prefix, const Hash& transactionHash) {
-		m_extra.parse(prefix.extra);
+TransactionPrefixImpl::TransactionPrefixImpl() {
+}
 
-		m_txPrefix = prefix;
-		m_txHash = transactionHash;
-	}
+TransactionPrefixImpl::TransactionPrefixImpl(const TransactionPrefix& prefix, const Hash& transactionHash) {
+  m_extra.parse(prefix.extra);
 
-	Hash TransactionPrefixImpl::getTransactionHash() const {
-		return m_txHash;
-	}
+  m_txPrefix = prefix;
+  m_txHash = transactionHash;
+}
 
-	Hash TransactionPrefixImpl::getTransactionPrefixHash() const {
-		return getObjectHash(m_txPrefix);
-	}
+Hash TransactionPrefixImpl::getTransactionHash() const {
+  return m_txHash;
+}
 
-	PublicKey TransactionPrefixImpl::getTransactionPublicKey() const {
-		Crypto::PublicKey pk(NULL_PUBLIC_KEY);
-		m_extra.getPublicKey(pk);
-		return pk;
-	}
+Hash TransactionPrefixImpl::getTransactionPrefixHash() const {
+  return getObjectHash(m_txPrefix);
+}
 
-	uint64_t TransactionPrefixImpl::getUnlockTime() const {
-		return m_txPrefix.unlockTime;
-	}
+PublicKey TransactionPrefixImpl::getTransactionPublicKey() const {
+  Crypto::PublicKey pk(NULL_PUBLIC_KEY);
+  m_extra.getPublicKey(pk);
+  return pk;
+}
 
-	bool TransactionPrefixImpl::getPaymentId(Hash& hash) const {
-		BinaryArray nonce;
+uint64_t TransactionPrefixImpl::getUnlockTime() const {
+  return m_txPrefix.unlockTime;
+}
 
-		if (getExtraNonce(nonce)) {
-			Crypto::Hash paymentId;
-			if (getPaymentIdFromTransactionExtraNonce(nonce, paymentId)) {
-				hash = reinterpret_cast<const Hash&>(paymentId);
-				return true;
-			}
-		}
+bool TransactionPrefixImpl::getPaymentId(Hash& hash) const {
+  BinaryArray nonce;
 
-		return false;
-	}
+  if (getExtraNonce(nonce)) {
+    Crypto::Hash paymentId;
+    if (getPaymentIdFromTransactionExtraNonce(nonce, paymentId)) {
+      hash = reinterpret_cast<const Hash&>(paymentId);
+      return true;
+    }
+  }
 
-	bool TransactionPrefixImpl::getExtraNonce(BinaryArray& nonce) const {
-		TransactionExtraNonce extraNonce;
+  return false;
+}
 
-		if (m_extra.get(extraNonce)) {
-			nonce = extraNonce.nonce;
-			return true;
-		}
+bool TransactionPrefixImpl::getExtraNonce(BinaryArray& nonce) const {
+  TransactionExtraNonce extraNonce;
 
-		return false;
-	}
+  if (m_extra.get(extraNonce)) {
+    nonce = extraNonce.nonce;
+    return true;
+  }
 
-	BinaryArray TransactionPrefixImpl::getExtra() const {
-		return m_txPrefix.extra;
-	}
+  return false;
+}
 
-	size_t TransactionPrefixImpl::getInputCount() const {
-		return m_txPrefix.inputs.size();
-	}
+BinaryArray TransactionPrefixImpl::getExtra() const {
+  return m_txPrefix.extra;
+}
 
-	uint64_t TransactionPrefixImpl::getInputTotalAmount() const {
-		return std::accumulate(m_txPrefix.inputs.begin(), m_txPrefix.inputs.end(), 0ULL, [](uint64_t val, const TransactionInput& in) {
-			return val + getTransactionInputAmount(in); });
-	}
+size_t TransactionPrefixImpl::getInputCount() const {
+  return m_txPrefix.inputs.size();
+}
 
-	TransactionTypes::InputType TransactionPrefixImpl::getInputType(size_t index) const {
-		return getTransactionInputType(getInputChecked(m_txPrefix, index));
-	}
+uint64_t TransactionPrefixImpl::getInputTotalAmount() const {
+  return std::accumulate(m_txPrefix.inputs.begin(), m_txPrefix.inputs.end(), 0ULL, [](uint64_t val, const TransactionInput& in) {
+    return val + getTransactionInputAmount(in); });
+}
 
-	void TransactionPrefixImpl::getInput(size_t index, KeyInput& input) const {
-		input = boost::get<KeyInput>(getInputChecked(m_txPrefix, index, TransactionTypes::InputType::Key));
-	}
+TransactionTypes::InputType TransactionPrefixImpl::getInputType(size_t index) const {
+  return getTransactionInputType(getInputChecked(m_txPrefix, index));
+}
 
-	void TransactionPrefixImpl::getInput(size_t index, MultisignatureInput& input) const {
-		input = boost::get<MultisignatureInput>(getInputChecked(m_txPrefix, index, TransactionTypes::InputType::Multisignature));
-	}
+void TransactionPrefixImpl::getInput(size_t index, KeyInput& input) const {
+  input = boost::get<KeyInput>(getInputChecked(m_txPrefix, index, TransactionTypes::InputType::Key));
+}
 
-	size_t TransactionPrefixImpl::getOutputCount() const {
-		return m_txPrefix.outputs.size();
-	}
+void TransactionPrefixImpl::getInput(size_t index, MultisignatureInput& input) const {
+  input = boost::get<MultisignatureInput>(getInputChecked(m_txPrefix, index, TransactionTypes::InputType::Multisignature));
+}
 
-	uint64_t TransactionPrefixImpl::getOutputTotalAmount() const {
-		return std::accumulate(m_txPrefix.outputs.begin(), m_txPrefix.outputs.end(), 0ULL, [](uint64_t val, const TransactionOutput& out) {
-			return val + out.amount; });
-	}
+size_t TransactionPrefixImpl::getOutputCount() const {
+  return m_txPrefix.outputs.size();
+}
 
-	TransactionTypes::OutputType TransactionPrefixImpl::getOutputType(size_t index) const {
-		return getTransactionOutputType(getOutputChecked(m_txPrefix, index).target);
-	}
+uint64_t TransactionPrefixImpl::getOutputTotalAmount() const {
+  return std::accumulate(m_txPrefix.outputs.begin(), m_txPrefix.outputs.end(), 0ULL, [](uint64_t val, const TransactionOutput& out) {
+    return val + out.amount; });
+}
 
-	void TransactionPrefixImpl::getOutput(size_t index, KeyOutput& output, uint64_t& amount) const {
-		const auto& out = getOutputChecked(m_txPrefix, index, TransactionTypes::OutputType::Key);
-		output = boost::get<KeyOutput>(out.target);
-		amount = out.amount;
-	}
+TransactionTypes::OutputType TransactionPrefixImpl::getOutputType(size_t index) const {
+  return getTransactionOutputType(getOutputChecked(m_txPrefix, index).target);
+}
 
-	void TransactionPrefixImpl::getOutput(size_t index, MultisignatureOutput& output, uint64_t& amount) const {
-		const auto& out = getOutputChecked(m_txPrefix, index, TransactionTypes::OutputType::Multisignature);
-		output = boost::get<MultisignatureOutput>(out.target);
-		amount = out.amount;
-	}
+void TransactionPrefixImpl::getOutput(size_t index, KeyOutput& output, uint64_t& amount) const {
+  const auto& out = getOutputChecked(m_txPrefix, index, TransactionTypes::OutputType::Key);
+  output = boost::get<KeyOutput>(out.target);
+  amount = out.amount;
+}
 
-	size_t TransactionPrefixImpl::getRequiredSignaturesCount(size_t inputIndex) const {
-		return ::CryptoNote::getRequiredSignaturesCount(getInputChecked(m_txPrefix, inputIndex));
-	}
+void TransactionPrefixImpl::getOutput(size_t index, MultisignatureOutput& output, uint64_t& amount) const {
+  const auto& out = getOutputChecked(m_txPrefix, index, TransactionTypes::OutputType::Multisignature);
+  output = boost::get<MultisignatureOutput>(out.target);
+  amount = out.amount;
+}
 
-	bool TransactionPrefixImpl::findOutputsToAccount(const AccountPublicAddress& addr, const SecretKey& viewSecretKey, std::vector<uint32_t>& outs, uint64_t& outputAmount) const {
-		return ::CryptoNote::findOutputsToAccount(m_txPrefix, addr, viewSecretKey, outs, outputAmount);
-	}
+size_t TransactionPrefixImpl::getRequiredSignaturesCount(size_t inputIndex) const {
+  return ::CryptoNote::getRequiredSignaturesCount(getInputChecked(m_txPrefix, inputIndex));
+}
 
-	bool TransactionPrefixImpl::validateInputs() const {
-		return check_inputs_types_supported(m_txPrefix) &&
-			check_inputs_overflow(m_txPrefix) &&
-			checkInputsKeyimagesDiff(m_txPrefix) &&
-			checkMultisignatureInputsDiff(m_txPrefix);
-	}
+bool TransactionPrefixImpl::findOutputsToAccount(const AccountPublicAddress& addr, const SecretKey& viewSecretKey, std::vector<uint32_t>& outs, uint64_t& outputAmount) const {
+  return ::CryptoNote::findOutputsToAccount(m_txPrefix, addr, viewSecretKey, outs, outputAmount);
+}
 
-	bool TransactionPrefixImpl::validateOutputs() const {
-		return check_outs_valid(m_txPrefix) &&
-			check_outs_overflow(m_txPrefix);
-	}
+bool TransactionPrefixImpl::validateInputs() const {
+  return check_inputs_types_supported(m_txPrefix) &&
+          check_inputs_overflow(m_txPrefix) &&
+          checkInputsKeyimagesDiff(m_txPrefix) &&
+          checkMultisignatureInputsDiff(m_txPrefix);
+}
 
-	bool TransactionPrefixImpl::validateSignatures() const {
-		throw std::system_error(std::make_error_code(std::errc::function_not_supported), "Validating signatures is not supported for transaction prefix");
-	}
+bool TransactionPrefixImpl::validateOutputs() const {
+  return check_outs_valid(m_txPrefix) &&
+          check_outs_overflow(m_txPrefix);
+}
 
-	BinaryArray TransactionPrefixImpl::getTransactionData() const {
-		return toBinaryArray(m_txPrefix);
-	}
+bool TransactionPrefixImpl::validateSignatures() const {
+  throw std::system_error(std::make_error_code(std::errc::function_not_supported), "Validating signatures is not supported for transaction prefix");
+}
 
-	bool TransactionPrefixImpl::getTransactionSecretKey(SecretKey& key) const {
-		return false;
-	}
+BinaryArray TransactionPrefixImpl::getTransactionData() const {
+  return toBinaryArray(m_txPrefix);
+}
 
-	std::unique_ptr<ITransactionReader> createTransactionPrefix(const TransactionPrefix& prefix, const Hash& transactionHash) {
-		return std::unique_ptr<ITransactionReader>(new TransactionPrefixImpl(prefix, transactionHash));
-	}
+bool TransactionPrefixImpl::getTransactionSecretKey(SecretKey& key) const {
+  return false;
+}
 
-	std::unique_ptr<ITransactionReader> createTransactionPrefix(const Transaction& fullTransaction) {
-		return std::unique_ptr<ITransactionReader>(new TransactionPrefixImpl(fullTransaction, getObjectHash(fullTransaction)));
-	}
+
+std::unique_ptr<ITransactionReader> createTransactionPrefix(const TransactionPrefix& prefix, const Hash& transactionHash) {
+  return std::unique_ptr<ITransactionReader> (new TransactionPrefixImpl(prefix, transactionHash));
+}
+
+std::unique_ptr<ITransactionReader> createTransactionPrefix(const Transaction& fullTransaction) {
+  return std::unique_ptr<ITransactionReader> (new TransactionPrefixImpl(fullTransaction, getObjectHash(fullTransaction)));
+}
+
 }

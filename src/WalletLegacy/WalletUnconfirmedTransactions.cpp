@@ -1,3 +1,8 @@
+// Copyright (c) 2011-2016 The Cryptonote developers
+// Copyright (c) 2014-2016 SDN developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include "WalletUnconfirmedTransactions.h"
 #include "WalletLegacy/WalletLegacySerialization.h"
 
@@ -8,217 +13,220 @@
 using namespace Crypto;
 
 namespace CryptoNote {
-	inline TransactionOutputId getOutputId(const TransactionOutputInformation& out) {
-		return std::make_pair(out.transactionPublicKey, out.outputInTransaction);
-	}
 
-	WalletUnconfirmedTransactions::WalletUnconfirmedTransactions(uint64_t uncofirmedTransactionsLiveTime) :
-		m_uncofirmedTransactionsLiveTime(uncofirmedTransactionsLiveTime) {
-	}
+inline TransactionOutputId getOutputId(const TransactionOutputInformation& out) {
+  return std::make_pair(out.transactionPublicKey, out.outputInTransaction);
+}
 
-	bool WalletUnconfirmedTransactions::serialize(ISerializer& s) {
-		s(m_unconfirmedTxs, "transactions");
-		s(m_createdDeposits, "unconfirmedCreatedDeposits");
-		s(m_spentDeposits, "unconfirmedSpentDeposits");
+WalletUnconfirmedTransactions::WalletUnconfirmedTransactions(uint64_t uncofirmedTransactionsLiveTime):
+  m_uncofirmedTransactionsLiveTime(uncofirmedTransactionsLiveTime) {
 
-		if (s.type() == ISerializer::INPUT) {
-			collectUsedOutputs();
-		}
+}
 
-		return true;
-	}
+bool WalletUnconfirmedTransactions::serialize(ISerializer& s) {
+  s(m_unconfirmedTxs, "transactions");
+  s(m_createdDeposits, "unconfirmedCreatedDeposits");
+  s(m_spentDeposits, "unconfirmedSpentDeposits");
 
-	bool WalletUnconfirmedTransactions::deserializeV1(ISerializer& s) {
-		s(m_unconfirmedTxs, "transactions");
+  if (s.type() == ISerializer::INPUT) {
+    collectUsedOutputs();
+  }
 
-		if (s.type() == ISerializer::INPUT) {
-			collectUsedOutputs();
-		}
+  return true;
+}
 
-		return true;
-	}
+bool WalletUnconfirmedTransactions::deserializeV1(ISerializer& s) {
+  s(m_unconfirmedTxs, "transactions");
 
-	bool WalletUnconfirmedTransactions::findTransactionId(const Hash& hash, TransactionId& id) {
-		return findUnconfirmedTransactionId(hash, id) || findUnconfirmedDepositSpendingTransactionId(hash, id);
-	}
+  if (s.type() == ISerializer::INPUT) {
+    collectUsedOutputs();
+  }
 
-	bool WalletUnconfirmedTransactions::findUnconfirmedTransactionId(const Crypto::Hash& hash, TransactionId& id) {
-		auto it = m_unconfirmedTxs.find(hash);
-		if (it == m_unconfirmedTxs.end()) {
-			return false;
-		}
+  return true;
+}
 
-		id = it->second.transactionId;
-		return true;
-	}
+bool WalletUnconfirmedTransactions::findTransactionId(const Hash& hash, TransactionId& id) {
+  return findUnconfirmedTransactionId(hash, id) || findUnconfirmedDepositSpendingTransactionId(hash, id);
+}
 
-	bool WalletUnconfirmedTransactions::findUnconfirmedDepositSpendingTransactionId(const Crypto::Hash& hash, TransactionId& id) {
-		auto it = m_spentDeposits.find(hash);
-		if (it == m_spentDeposits.end()) {
-			return false;
-		}
+bool WalletUnconfirmedTransactions::findUnconfirmedTransactionId(const Crypto::Hash& hash, TransactionId& id) {
+  auto it = m_unconfirmedTxs.find(hash);
+  if (it == m_unconfirmedTxs.end()) {
+    return false;
+  }
 
-		id = it->second.transactionId;
-		return true;
-	}
+  id = it->second.transactionId;
+  return true;
+}
 
-	void WalletUnconfirmedTransactions::erase(const Hash& hash) {
-		eraseUnconfirmedTransaction(hash) || eraseDepositSpendingTransaction(hash);
-	}
+bool WalletUnconfirmedTransactions::findUnconfirmedDepositSpendingTransactionId(const Crypto::Hash& hash, TransactionId& id) {
+  auto it = m_spentDeposits.find(hash);
+  if (it == m_spentDeposits.end()) {
+    return false;
+  }
 
-	bool WalletUnconfirmedTransactions::eraseUnconfirmedTransaction(const Crypto::Hash& hash) {
-		auto it = m_unconfirmedTxs.find(hash);
-		if (it == m_unconfirmedTxs.end()) {
-			return false;
-		}
+  id = it->second.transactionId;
+  return true;
+}
 
-		deleteUsedOutputs(it->second.usedOutputs);
-		m_unconfirmedTxs.erase(it);
+void WalletUnconfirmedTransactions::erase(const Hash& hash) {
+  eraseUnconfirmedTransaction(hash) || eraseDepositSpendingTransaction(hash);
+}
 
-		return true;
-	}
+bool WalletUnconfirmedTransactions::eraseUnconfirmedTransaction(const Crypto::Hash& hash) {
+  auto it = m_unconfirmedTxs.find(hash);
+  if (it == m_unconfirmedTxs.end()) {
+    return false;
+  }
 
-	bool WalletUnconfirmedTransactions::eraseDepositSpendingTransaction(const Crypto::Hash& hash) {
-		auto it = m_spentDeposits.find(hash);
-		if (it == m_spentDeposits.end()) {
-			return false;
-		}
+  deleteUsedOutputs(it->second.usedOutputs);
+  m_unconfirmedTxs.erase(it);
 
-		m_spentDeposits.erase(it);
+  return true;
+}
 
-		return true;
-	}
+bool WalletUnconfirmedTransactions::eraseDepositSpendingTransaction(const Crypto::Hash& hash) {
+  auto it = m_spentDeposits.find(hash);
+  if (it == m_spentDeposits.end()) {
+    return false;
+  }
 
-	void WalletUnconfirmedTransactions::add(const Transaction& tx, TransactionId transactionId,
-		uint64_t amount, const std::vector<TransactionOutputInformation>& usedOutputs) {
-		UnconfirmedTransferDetails& utd = m_unconfirmedTxs[getObjectHash(tx)];
+  m_spentDeposits.erase(it);
 
-		utd.amount = amount;
-		utd.sentTime = time(nullptr);
-		utd.tx = tx;
-		utd.transactionId = transactionId;
+  return true;
+}
 
-		uint64_t outsAmount = 0;
-		// process used outputs
-		utd.usedOutputs.reserve(usedOutputs.size());
-		for (const auto& out : usedOutputs) {
-			auto id = getOutputId(out);
-			utd.usedOutputs.push_back(id);
-			m_usedOutputs.insert(id);
-			outsAmount += out.amount;
-		}
+void WalletUnconfirmedTransactions::add(const Transaction& tx, TransactionId transactionId, 
+  uint64_t amount, const std::vector<TransactionOutputInformation>& usedOutputs) {
 
-		utd.outsAmount = outsAmount;
-	}
+  UnconfirmedTransferDetails& utd = m_unconfirmedTxs[getObjectHash(tx)];
 
-	void WalletUnconfirmedTransactions::updateTransactionId(const Hash& hash, TransactionId id) {
-		auto it = m_unconfirmedTxs.find(hash);
-		if (it != m_unconfirmedTxs.end()) {
-			it->second.transactionId = id;
-		}
-	}
+  utd.amount = amount;
+  utd.sentTime = time(nullptr);
+  utd.tx = tx;
+  utd.transactionId = transactionId;
 
-	void WalletUnconfirmedTransactions::addCreatedDeposit(DepositId id, uint64_t totalAmount) {
-		m_createdDeposits[id] = totalAmount;
-	}
+  uint64_t outsAmount = 0;
+  // process used outputs
+  utd.usedOutputs.reserve(usedOutputs.size());
+  for (const auto& out : usedOutputs) {
+    auto id = getOutputId(out);
+    utd.usedOutputs.push_back(id);
+    m_usedOutputs.insert(id);
+    outsAmount += out.amount;
+  }
 
-	void WalletUnconfirmedTransactions::addDepositSpendingTransaction(const Hash& transactionHash, const UnconfirmedSpentDepositDetails& details) {
-		assert(m_spentDeposits.count(transactionHash) == 0);
-		m_spentDeposits.emplace(transactionHash, details);
-	}
+  utd.outsAmount = outsAmount;
+}
 
-	void WalletUnconfirmedTransactions::eraseCreatedDeposit(DepositId id) {
-		m_createdDeposits.erase(id);
-	}
+void WalletUnconfirmedTransactions::updateTransactionId(const Hash& hash, TransactionId id) {
+  auto it = m_unconfirmedTxs.find(hash);
+  if (it != m_unconfirmedTxs.end()) {
+    it->second.transactionId = id;
+  }
+}
 
-	uint64_t WalletUnconfirmedTransactions::countCreatedDepositsSum() const {
-		uint64_t sum = 0;
+void WalletUnconfirmedTransactions::addCreatedDeposit(DepositId id, uint64_t totalAmount) {
+  m_createdDeposits[id] = totalAmount;
+}
 
-		for (const auto& kv : m_createdDeposits) {
-			sum += kv.second;
-		}
+void WalletUnconfirmedTransactions::addDepositSpendingTransaction(const Hash& transactionHash, const UnconfirmedSpentDepositDetails& details) {
+  assert(m_spentDeposits.count(transactionHash) == 0);
+  m_spentDeposits.emplace(transactionHash, details);
+}
 
-		return sum;
-	}
+void WalletUnconfirmedTransactions::eraseCreatedDeposit(DepositId id) {
+  m_createdDeposits.erase(id);
+}
 
-	uint64_t WalletUnconfirmedTransactions::countSpentDepositsProfit() const {
-		uint64_t sum = 0;
+uint64_t WalletUnconfirmedTransactions::countCreatedDepositsSum() const {
+  uint64_t sum = 0;
 
-		for (const auto& kv : m_spentDeposits) {
-			sum += kv.second.depositsSum - kv.second.fee;
-		}
+  for (const auto& kv: m_createdDeposits) {
+    sum += kv.second;
+  }
 
-		return sum;
-	}
+  return sum;
+}
 
-	uint64_t WalletUnconfirmedTransactions::countSpentDepositsTotalAmount() const {
-		uint64_t sum = 0;
+uint64_t WalletUnconfirmedTransactions::countSpentDepositsProfit() const {
+  uint64_t sum = 0;
 
-		for (const auto& kv : m_spentDeposits) {
-			sum += kv.second.depositsSum;
-		}
+  for (const auto& kv: m_spentDeposits) {
+    sum += kv.second.depositsSum - kv.second.fee;
+  }
 
-		return sum;
-	}
+  return sum;
+}
 
-	uint64_t WalletUnconfirmedTransactions::countUnconfirmedOutsAmount() const {
-		uint64_t amount = 0;
+uint64_t WalletUnconfirmedTransactions::countSpentDepositsTotalAmount() const {
+  uint64_t sum = 0;
 
-		for (auto& utx : m_unconfirmedTxs)
-			amount += utx.second.outsAmount;
+  for (const auto& kv: m_spentDeposits) {
+    sum += kv.second.depositsSum;
+  }
 
-		return amount;
-	}
+  return sum;
+}
 
-	uint64_t WalletUnconfirmedTransactions::countUnconfirmedTransactionsAmount() const {
-		uint64_t amount = 0;
+uint64_t WalletUnconfirmedTransactions::countUnconfirmedOutsAmount() const {
+  uint64_t amount = 0;
 
-		for (auto& utx : m_unconfirmedTxs)
-			amount += utx.second.amount;
+  for (auto& utx: m_unconfirmedTxs)
+    amount+= utx.second.outsAmount;
 
-		return amount;
-	}
+  return amount;
+}
 
-	bool WalletUnconfirmedTransactions::isUsed(const TransactionOutputInformation& out) const {
-		return m_usedOutputs.find(getOutputId(out)) != m_usedOutputs.end();
-	}
+uint64_t WalletUnconfirmedTransactions::countUnconfirmedTransactionsAmount() const {
+  uint64_t amount = 0;
 
-	void WalletUnconfirmedTransactions::collectUsedOutputs() {
-		UsedOutputsContainer used;
-		for (const auto& kv : m_unconfirmedTxs) {
-			used.insert(kv.second.usedOutputs.begin(), kv.second.usedOutputs.end());
-		}
-		m_usedOutputs = std::move(used);
-	}
+  for (auto& utx: m_unconfirmedTxs)
+    amount+= utx.second.amount;
 
-	void WalletUnconfirmedTransactions::reset() {
-		m_unconfirmedTxs.clear();
-		m_usedOutputs.clear();
-	}
+  return amount;
+}
 
-	void WalletUnconfirmedTransactions::deleteUsedOutputs(const std::vector<TransactionOutputId>& usedOutputs) {
-		for (const auto& output : usedOutputs) {
-			m_usedOutputs.erase(output);
-		}
-	}
+bool WalletUnconfirmedTransactions::isUsed(const TransactionOutputInformation& out) const {
+  return m_usedOutputs.find(getOutputId(out)) != m_usedOutputs.end();
+}
 
-	std::vector<TransactionId> WalletUnconfirmedTransactions::deleteOutdatedTransactions() {
-		std::vector<TransactionId> deletedTransactions;
+void WalletUnconfirmedTransactions::collectUsedOutputs() {
+  UsedOutputsContainer used;
+  for (const auto& kv : m_unconfirmedTxs) {
+    used.insert(kv.second.usedOutputs.begin(), kv.second.usedOutputs.end());
+  }
+  m_usedOutputs = std::move(used);
+}
 
-		uint64_t now = static_cast<uint64_t>(time(nullptr));
-		assert(now >= m_uncofirmedTransactionsLiveTime);
+void WalletUnconfirmedTransactions::reset() {
+  m_unconfirmedTxs.clear();
+  m_usedOutputs.clear();
+}
 
-		for (auto it = m_unconfirmedTxs.begin(); it != m_unconfirmedTxs.end();) {
-			if (static_cast<uint64_t>(it->second.sentTime) <= now - m_uncofirmedTransactionsLiveTime) {
-				deleteUsedOutputs(it->second.usedOutputs);
-				deletedTransactions.push_back(it->second.transactionId);
-				it = m_unconfirmedTxs.erase(it);
-			}
-			else {
-				++it;
-			}
-		}
+void WalletUnconfirmedTransactions::deleteUsedOutputs(const std::vector<TransactionOutputId>& usedOutputs) {
+  for (const auto& output: usedOutputs) {
+    m_usedOutputs.erase(output);
+  }
+}
 
-		return deletedTransactions;
-	}
+std::vector<TransactionId> WalletUnconfirmedTransactions::deleteOutdatedTransactions() {
+  std::vector<TransactionId> deletedTransactions;
+
+  uint64_t now = static_cast<uint64_t>(time(nullptr));
+  assert(now >= m_uncofirmedTransactionsLiveTime);
+
+  for (auto it = m_unconfirmedTxs.begin(); it != m_unconfirmedTxs.end();) {
+    if (static_cast<uint64_t>(it->second.sentTime) <= now - m_uncofirmedTransactionsLiveTime) {
+      deleteUsedOutputs(it->second.usedOutputs);
+      deletedTransactions.push_back(it->second.transactionId);
+      it = m_unconfirmedTxs.erase(it);
+    } else {
+      ++it;
+    }
+  }
+
+  return deletedTransactions;
+}
+
 } /* namespace CryptoNote */
