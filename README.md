@@ -7,7 +7,7 @@
 
 PK has been tested to compile on Windows 8-10 with VS2013, OSX High Sierra, Ubuntu 14-18, Solus, and EL7 ( must add elrepo & epel)
 
-
+  The legacy branch is tweaked to run on VPS (openvz) with very old kernels.  If you cannot get it running, please contact jerry on twitter or discord.
 
 for ubuntu:  
      apt install screen make cmake build-essential libboost-all-dev pkg-config libssl-dev libzmq3-dev libunbound-dev libsodium-dev libminiupnpc-dev libreadline6-dev libldns-dev
