@@ -1,9 +1,3 @@
-// Copyright (c) 2011-2017 The Cryptonote developers
-// Copyright (c) 2014-2017 XDN developers
-// Copyright (c) 2016-2017 BXC developers
-// Copyright (c) 2017 Royalties developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "SimpleWallet.h"
 
@@ -561,7 +555,7 @@ simple_wallet::simple_wallet(System::Dispatcher& dispatcher, const CryptoNote::C
   m_consoleHandler.setHandler("export_keys", boost::bind(&simple_wallet::export_keys, this, _1), "Show the secret keys of the opened wallet");
   m_consoleHandler.setHandler("balance", boost::bind(&simple_wallet::show_balance, this, _1), "Show current wallet balance");
   m_consoleHandler.setHandler("incoming_transfers", boost::bind(&simple_wallet::show_incoming_transfers, this, _1), "Show incoming transfers");
-  m_consoleHandler.setHandler("list_transfers", boost::bind(&simple_wallet::listTransfers, this, _1), "Show all known transfers");
+  m_consoleHandler.setHandler("list_transfers", boost::bind(&simple_wallet::listTransfers, this, _1), "list_transfers <height> - Show all known transfers from a certain (optional) block height");
   m_consoleHandler.setHandler("payments", boost::bind(&simple_wallet::show_payments, this, _1), "payments <payment_id_1> [<payment_id_2> ... <payment_id_N>] - Show payments <payment_id_1>, ... <payment_id_N>");
   m_consoleHandler.setHandler("bc_height", boost::bind(&simple_wallet::show_blockchain_height, this, _1), "Show blockchain height");
   m_consoleHandler.setHandler("transfer", boost::bind(&simple_wallet::transfer, this, _1),
@@ -606,13 +600,13 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
   }
 
   if (m_generate_new.empty() && m_wallet_file_arg.empty()) {
-    std::cout << "Choose from the following\n \n[O]pen existing wallet\n[G]enerate new wallet\n[I]mport from spend & receive keys\n[E]xit.\n";
+    std::cout << "Choose from the following\n \n[O]pen existing wallet\n[G]enerate new wallet\n[R]estore from private key\n[I]mport from spend & receive keys\n[E]xit.\n";
     char c;
     do {
       std::string answer;
       std::getline(std::cin, answer);
       c = answer[0];
-      if (!(c == 'O' || c == 'G' || c == 'E' || c == 'I' || c == 'o' || c == 'g' || c == 'e' || c == 'i' )) {
+      if (!(c == 'O' || c == 'G' || c == 'E' || c == 'I' || c == 'o' || c == 'g' || c == 'e' || c == 'R' || c == 'r' || c == 'i' )) {
         std::cout << "Unknown command: " << c <<std::endl;
       } else {
         break;
@@ -635,6 +629,8 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
       m_import_new = userInput;
     } else if (c == 'g' || c == 'G') {
       m_generate_new = userInput;
+	  }else if (c == 'R' || c == 'r') {
+     m_restore_new = userInput;
     } else {
       m_wallet_file_arg = userInput;
     }
@@ -776,7 +772,7 @@ if (!m_generate_new.empty()) {
       uint64_t addressPrefix;
       std::string data;
 
-      if (private_key_string.length() != 183) {
+      if (private_key_string.length() != 185) {
           logger(ERROR, BRIGHT_RED) << "Wrong Private key.";
           return false;
       }
@@ -1201,9 +1197,23 @@ bool simple_wallet::show_incoming_transfers(const std::vector<std::string>& args
 bool simple_wallet::listTransfers(const std::vector<std::string>& args) {
   bool haveTransfers = false;
 
-  size_t transactionsCount = m_wallet->getTransactionCount();
-  for (size_t trantransactionNumber = 0; trantransactionNumber < transactionsCount; ++trantransactionNumber) {
-    WalletLegacyTransaction txInfo;
+ bool haveBlockHeight = false;
+  std::string blockHeightString = ""; 
+  int blockHeight;
+  WalletLegacyTransaction txInfo;
+  /* get block height from arguments */
+  if (args.empty()) 
+  {
+    haveBlockHeight = false;
+  } else {
+    blockHeightString = args[0];
+    haveBlockHeight = true;
+    blockHeight = atoi(blockHeightString.c_str());
+  }
+	 size_t transactionsCount = m_wallet->getTransactionCount();
+		
+		for (size_t trantransactionNumber = 0; trantransactionNumber < transactionsCount; ++trantransactionNumber) 
+  {
     m_wallet->getTransaction(trantransactionNumber, txInfo);
     if (txInfo.state != WalletLegacyTransactionState::Active || txInfo.blockHeight == WALLET_LEGACY_UNCONFIRMED_TRANSACTION_HEIGHT) {
       continue;
@@ -1213,8 +1223,13 @@ bool simple_wallet::listTransfers(const std::vector<std::string>& args) {
       printListTransfersHeader(logger);
       haveTransfers = true;
     }
-
-    printListTransfersItem(logger, txInfo, *m_wallet, m_currency);
+	 if (haveBlockHeight = false) {
+      printListTransfersItem(logger, txInfo, *m_wallet, m_currency);
+    } else {
+      if (txInfo.blockHeight >= blockHeight) {
+        printListTransfersItem(logger, txInfo, *m_wallet, m_currency);
+      }
+    }
   }
 
   if (!haveTransfers) {
