@@ -744,6 +744,16 @@ bool Blockchain::switch_to_alternative_blockchain(std::list<blocks_ext_by_hash::
     logger(ERROR, BRIGHT_RED) << "switch_to_alternative_blockchain: empty chain passed";
     return false;
   }
+ /*
+    For a coin with small hashrate as a temp. 51% attack protection
+    do not allow reogrs with long alt. chain as normally 
+    reorgs longer than 2 blocks do not happen.
+    By fireice_uk from Ryo Currency Project
+  */
+  if (alt_chain.size() > 5) {
+    logger(ERROR, BRIGHT_RED) << "Attempt to switch to an improbably long alt. chain of size " << alt_chain.size() << " blocked - likely 51% attack.";
+    return false;
+  }
 
   size_t split_height = alt_chain.front()->second.height;
 
