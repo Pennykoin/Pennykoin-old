@@ -96,6 +96,7 @@ namespace Tools {
 				{ "get_payments", makeMemberMethod(&wallet_rpc_server::on_get_payments) },
 				{ "get_transfers", makeMemberMethod(&wallet_rpc_server::on_get_transfers) },
 				{ "get_height", makeMemberMethod(&wallet_rpc_server::on_get_height) },
+			
 				{ "reset", makeMemberMethod(&wallet_rpc_server::on_reset) }
 			};
 
