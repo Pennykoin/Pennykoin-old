@@ -81,6 +81,7 @@ namespace CryptoNote
     bool show_blockchain_height(const std::vector<std::string> &args);
     bool listTransfers(const std::vector<std::string> &args);
     bool export_keys(const std::vector<std::string> &args = std::vector<std::string>());
+    bool export_tracking_key(const std::vector<std::string> &args = std::vector<std::string>());
     bool transfer(const std::vector<std::string> &args);
     bool print_address(const std::vector<std::string> &args = std::vector<std::string>());
     bool save(const std::vector<std::string> &args);
@@ -151,6 +152,7 @@ namespace CryptoNote
     std::string m_generate_new;
     std::string m_import_new;
     std::string m_restore_new;
+     std::string m_track_new;
     std::string m_import_path;
 
     std::string m_daemon_address;
@@ -170,7 +172,7 @@ namespace CryptoNote
     std::unique_ptr<CryptoNote::NodeRpcProxy> m_node;
     std::unique_ptr<CryptoNote::IWalletLegacy> m_wallet;
     refresh_progress_reporter_t m_refresh_progress_reporter;
-
+ bool m_trackingWallet;
     bool m_walletSynchronized;
     std::mutex m_walletSynchronizedMutex;
     std::condition_variable m_walletSynchronizedCV;
