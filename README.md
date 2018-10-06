@@ -12,4 +12,5 @@ log
 * import/export tracking code , import launches in tracking mode
 * gettransactionsbypaymentid fix
 * patched terminate error
+* rebased paymentgate to xun
 
