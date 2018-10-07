@@ -111,6 +111,26 @@ namespace Tools
 				KV_MEMBER(messages);
 			}
 		};
+ struct COMMAND_RPC_CREATE_INTEGRATED
+    {
+      struct request
+      {
+        std::string payment_id;
+        std::string address;      
+        void serialize(ISerializer& s) {
+          KV_MEMBER(payment_id)
+          KV_MEMBER(address)         
+        }
+      };
+      struct response
+      {
+        std::string integrated_address;
+        void serialize(ISerializer& s) 
+        {
+          KV_MEMBER(integrated_address)
+        }
+    };
+  };
 
 		struct COMMAND_RPC_GET_MESSAGES {
 			struct request {
