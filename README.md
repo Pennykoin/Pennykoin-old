@@ -17,4 +17,11 @@ log
 * can generate integrated addresses simplewallet
 * integrate works for SW rpc and gateway now
 * getlastblockheader includes deposit info
+* /getinfo has number of gen coins
+* network speed optimization from karbo
+* fixed hang on close error
+* more detailed rpc error messages
+* triangular distribution of mixins from XMR
+* status command for daemon
+
 

@@ -1,20 +1,23 @@
 #pragma once
 
 #include "Common/ConsoleHandler.h"
-
+#include "CryptoNoteProtocol/ICryptoNoteProtocolQuery.h"
 #include <Logging/LoggerRef.h>
 #include <Logging/LoggerManager.h>
+#include "Rpc/JsonRpc.h"
+#include "Rpc/RpcServer.h"
 
 namespace CryptoNote {
 	class core;
 	class Currency;
 	class NodeServer;
+	class ICryptoNoteProtocolQuery;
 }
 
 class DaemonCommandsHandler
 {
 public:
-	DaemonCommandsHandler(CryptoNote::core& core, CryptoNote::NodeServer& srv, Logging::LoggerManager& log);
+	 DaemonCommandsHandler(CryptoNote::core& core, CryptoNote::NodeServer& srv, Logging::LoggerManager& log, const CryptoNote::ICryptoNoteProtocolQuery& protocol, CryptoNote::RpcServer* prpc_server);
 
 	bool start_handling() {
 		m_consoleHandler.start();
@@ -33,7 +36,12 @@ private:
 	Logging::LoggerRef logger;
 	Logging::LoggerManager& m_logManager;
 
-	std::string get_commands_str();
+	 const CryptoNote::ICryptoNoteProtocolQuery& protocolQuery;
+  CryptoNote::RpcServer* m_prpc_server;
+  
+  std::string get_commands_str();
+  std::string get_mining_speed(uint32_t hr);
+  float get_sync_percentage(uint64_t height, uint64_t target_height);
 	bool print_block_by_height(uint32_t height);
 	bool print_block_by_hash(const std::string& arg);
 	uint64_t calculatePercent(const CryptoNote::Currency& currency, uint64_t value, uint64_t total);
@@ -54,5 +62,6 @@ private:
 	bool print_pool_sh(const std::vector<std::string>& args);
 	bool print_stat(const std::vector<std::string>& args);
 	bool start_mining(const std::vector<std::string>& args);
+	bool status(const std::vector<std::string>& args);
 	bool stop_mining(const std::vector<std::string>& args);
 };

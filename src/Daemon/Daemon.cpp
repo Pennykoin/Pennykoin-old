@@ -2,7 +2,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
-
+#include "CryptoNoteProtocol/ICryptoNoteProtocolQuery.h"
 #include "DaemonCommandsHandler.h"
 
 #include "Common/SignalHandler.h"
@@ -299,7 +299,7 @@ int main(int argc, char* argv[])
 
 		cprotocol.set_p2p_endpoint(&p2psrv);
 		ccore.set_cryptonote_protocol(&cprotocol);
-		DaemonCommandsHandler dch(ccore, p2psrv, logManager);
+		 DaemonCommandsHandler dch(ccore, p2psrv, logManager, cprotocol, &rpcServer);
 
 		// initialize objects
 		logger(INFO) << "Initializing p2p server...";

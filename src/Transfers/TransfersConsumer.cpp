@@ -185,7 +185,8 @@ namespace CryptoNote {
 		std::atomic<bool> stopProcessing(false);
 
 		auto pushingThread = std::async(std::launch::async, [&] {
-			for (uint32_t i = 0; i < count && !stopProcessing; ++i) {
+		uint32_t i = 0;
+    for (uint32_t j = count - 1; j--; ) {
 				const auto& block = blocks[i].block;
 
 				if (!block.is_initialized()) {
@@ -213,6 +214,7 @@ namespace CryptoNote {
 					inputQueue.push(item);
 					++blockInfo.transactionIndex;
 				}
+				  i++;
 			}
 
 			inputQueue.close();

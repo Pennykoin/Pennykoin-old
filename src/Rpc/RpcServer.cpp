@@ -330,11 +330,14 @@ namespace CryptoNote {
 		res.incoming_connections_count = total_conn - res.outgoing_connections_count;
 		res.white_peerlist_size = m_p2p.getPeerlistManager().get_white_peers_count();
 		res.grey_peerlist_size = m_p2p.getPeerlistManager().get_gray_peers_count();
+  		// that large uint64_t number is unsafe in JavaScript environment and therefore as a JSON value so we display it as a formatted string
+  		res.already_generated_coins = m_core.currency().formatAmount(m_core.getTotalGeneratedAmount());
 		res.last_known_block_index = std::max(static_cast<uint32_t>(1), m_protocolQuery.getObservedHeight()) - 1;
 		res.full_deposit_amount = m_core.fullDepositAmount();
 		res.full_deposit_interest = m_core.fullDepositInterest();
 		res.version = PROJECT_VERSION_LONG;
 		res.status = CORE_RPC_STATUS_OK;
+		 res.start_time = m_core.getStartTime();
 		return true;
 	}
 

@@ -1,3 +1,4 @@
+#pragma once
 #include "HttpServer.h"
 
 #include <functional>

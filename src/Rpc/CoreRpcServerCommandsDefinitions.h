@@ -261,8 +261,10 @@ namespace CryptoNote {
 			uint64_t grey_peerlist_size;
 			uint32_t last_known_block_index;
 			uint64_t full_deposit_amount;
+			  uint64_t start_time;
 			uint64_t full_deposit_interest;
-
+			  uint8_t block_major_version;
+	std::string already_generated_coins;
 			void serialize(ISerializer &s) {
 				KV_MEMBER(status)
 					KV_MEMBER(version)
@@ -271,11 +273,14 @@ namespace CryptoNote {
 					KV_MEMBER(tx_count)
 					KV_MEMBER(tx_pool_size)
 					KV_MEMBER(alt_blocks_count)
+					  KV_MEMBER(start_time)
 					KV_MEMBER(outgoing_connections_count)
 					KV_MEMBER(incoming_connections_count)
 					KV_MEMBER(white_peerlist_size)
 					KV_MEMBER(grey_peerlist_size)
 					KV_MEMBER(last_known_block_index)
+				    KV_MEMBER(block_major_version)
+  				    KV_MEMBER(already_generated_coins)
 					KV_MEMBER(full_deposit_amount)
 					KV_MEMBER(full_deposit_interest)
 			}

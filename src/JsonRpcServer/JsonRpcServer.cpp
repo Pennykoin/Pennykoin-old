@@ -6,7 +6,7 @@
 #include <memory>
 #include <sstream>
 #include "HTTP/HttpParserErrorCodes.h"
-
+#include "Rpc/JsonRpc.h"
 #include <System/TcpConnection.h>
 #include <System/TcpListener.h>
 #include <System/TcpStream.h>
@@ -89,7 +89,7 @@ namespace CryptoNote {
 		JsonValue error(JsonValue::OBJECT);
 
 		JsonValue code;
-		code = static_cast<int64_t>(-32000); //Application specific error code
+	code = static_cast<int64_t>(CryptoNote::JsonRpc::errParseError);
 
 		JsonValue message;
 		message = ec.message();
@@ -137,7 +137,7 @@ namespace CryptoNote {
 		JsonValue error(JsonValue::OBJECT);
 
 		JsonValue code;
-		code = static_cast<int64_t>(-32601); //ambigous declaration of JsonValue::operator= (between int and JsonValue)
+		code = static_cast<int64_t>(CryptoNote::JsonRpc::errMethodNotFound); //ambigous declaration of JsonValue::operator= (between int and JsonValue)
 
 		JsonValue message;
 		message = "Method not found";
@@ -161,7 +161,7 @@ namespace CryptoNote {
 
 		JsonValue error(JsonValue::OBJECT);
 		JsonValue code;
-		code = static_cast<int64_t>(-32700); //ambigous declaration of JsonValue::operator= (between int and JsonValue)
+		code = static_cast<int64_t>(CryptoNote::JsonRpc::errParseError); //ambigous declaration of JsonValue::operator= (between int and JsonValue)
 
 		JsonValue message = "Parse error";
 
