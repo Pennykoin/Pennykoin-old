@@ -13,4 +13,5 @@ log
 * gettransactionsbypaymentid fix
 * patched terminate error
 * rebased paymentgate to xun
-
+* ryo poisson altchain detection
+* can generate integrated addresses simplewallet
