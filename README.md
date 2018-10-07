@@ -15,3 +15,6 @@ log
 * rebased paymentgate to xun
 * ryo poisson altchain detection
 * can generate integrated addresses simplewallet
+* integrate works for SW rpc and gateway now
+* getlastblockheader includes deposit info
+

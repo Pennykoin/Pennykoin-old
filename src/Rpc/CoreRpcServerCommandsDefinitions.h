@@ -382,6 +382,7 @@ namespace CryptoNote {
 		bool orphan_status;
 		uint64_t height;
 		uint64_t depth;
+		uint64_t deposits;
 		std::string hash;
 		difficulty_type difficulty;
 		uint64_t reward;
@@ -392,6 +393,7 @@ namespace CryptoNote {
 				KV_MEMBER(timestamp)
 				KV_MEMBER(prev_hash)
 				KV_MEMBER(nonce)
+				 KV_MEMBER(deposits)
 				KV_MEMBER(orphan_status)
 				KV_MEMBER(height)
 				KV_MEMBER(depth)

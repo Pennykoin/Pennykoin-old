@@ -945,6 +945,7 @@ namespace CryptoNote {
 	void RpcServer::fill_block_header_response(const Block& blk, bool orphan_status, uint64_t height, const Hash& hash, block_header_response& responce) {
 		responce.major_version = blk.majorVersion;
 		responce.minor_version = blk.minorVersion;
+		responce.deposits = m_core.depositAmountAtHeight(height);
 		responce.timestamp = blk.timestamp;
 		responce.prev_hash = Common::podToHex(blk.previousBlockHash);
 		responce.nonce = blk.nonce;
