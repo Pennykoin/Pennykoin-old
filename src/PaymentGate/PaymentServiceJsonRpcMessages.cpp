@@ -7,7 +7,23 @@
 
 #include "PaymentServiceJsonRpcMessages.h"
 #include "Serialization/SerializationOverloads.h"
-
+#include "Common/CommandLine.h"
+#include "Common/StringTools.h"
+#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
+#include "CryptoNoteCore/Account.h"
+#include "crypto/hash.h"
+#include "CryptoNoteCore/CryptoNoteBasic.h"
+#include "CryptoNoteCore/CryptoNoteBasicImpl.h"
+#include "WalletLegacy/WalletHelper.h"
+#include "Common/Base58.h"
+#include "Common/CommandLine.h"
+#include "Common/SignalHandler.h"
+#include "Common/StringTools.h"
+#include "Common/PathTools.h"
+#include "Common/Util.h"
+#include "CryptoNoteCore/CryptoNoteFormatUtils.h"
+#include "CryptoNoteCore/CryptoNoteTools.h"
+#include "CryptoNoteProtocol/CryptoNoteProtocolHandler.h"
 namespace PaymentService {
 
 void Reset::Request::serialize(CryptoNote::ISerializer& serializer) {
@@ -129,7 +145,13 @@ void GetTransactionHashes::Request::serialize(CryptoNote::ISerializer& serialize
 void GetTransactionHashes::Response::serialize(CryptoNote::ISerializer& serializer) {
   serializer(items, "items");
 }
-
+void CreateIntegrated::Request::serialize(CryptoNote::ISerializer& serializer) {
+  serializer(address, "address");
+  serializer(payment_id, "payment_id");
+}
+void CreateIntegrated::Response::serialize(CryptoNote::ISerializer& serializer) {
+  serializer(integrated_address, "integrated_address");
+}
 void TransferRpcInfo::serialize(CryptoNote::ISerializer& serializer) {
   serializer(type, "type");
   serializer(address, "address");
