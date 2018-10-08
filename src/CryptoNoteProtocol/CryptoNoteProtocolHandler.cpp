@@ -231,7 +231,7 @@ namespace CryptoNote {
 			m_core.handle_incoming_tx(asBinaryArray(*tx_blob_it), tvc, true);
 			if (tvc.m_verification_failed) {
 				logger(Logging::INFO) << context << "Block verification failed: transaction verification failed, dropping connection";
-				context.m_state = CryptoNoteConnectionContext::state_shutdown;
+				m_p2p->drop_connection(context, true);
 				return 1;
 			}
 		}
@@ -240,7 +240,7 @@ namespace CryptoNote {
 		m_core.handle_incoming_block_blob(asBinaryArray(arg.b.block), bvc, true, false);
 		if (bvc.m_verification_failed) {
 			logger(Logging::DEBUGGING) << context << "Block verification failed, dropping connection";
-			context.m_state = CryptoNoteConnectionContext::state_shutdown;
+			m_p2p->drop_connection(context, true);
 			return 1;
 		}
 		if (bvc.m_added_to_main_chain) {

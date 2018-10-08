@@ -6,22 +6,42 @@
 
 log 
 * bionic specific - remove for gen rel
+
+##Wallet
 * transfers from height list_transfers command in simplewallet can be appended with a block number and only search beyond that
-* ryo 51% fix for low hash coins makes making long sidechains much harder
 * import/expor for view/spend in CLI
 * import/export tracking code , import launches in tracking mode
 * gettransactionsbypaymentid fix
+* can generate integrated addresses pkwallet
+* integrated addresses pkwallet rpc and gateway now
+* can find unlocked inputs that could be optimized, still working on the optimization
+
+##Security + Fixes + w/e
+* ryo 51% fix for low hash coins makes making long sidechains much harder
 * patched terminate error
 * rebased paymentgate to xun
 * ryo poisson altchain detection
-* can generate integrated addresses simplewallet
-* integrate works for SW rpc and gateway now
-* getlastblockheader includes deposit info
-* /getinfo has number of gen coins
-* network speed optimization from karbo
 * fixed hang on close error
 * more detailed rpc error messages
+* network speed optimization from karbo
 * triangular distribution of mixins from XMR
+
+
+##Daemon
+* getlastblockheader includes deposit info
+* /getinfo has number of gen coins
 * status command for daemon
+* implemented ban/unban commands and autoban (for clients with wrong version or bad handshake)
+
+
+
+
+
+
+
+
+
+
+
 
 

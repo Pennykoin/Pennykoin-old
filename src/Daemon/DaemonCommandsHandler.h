@@ -60,6 +60,9 @@ private:
 	bool print_tx(const std::vector<std::string>& args);
 	bool print_pool(const std::vector<std::string>& args);
 	bool print_pool_sh(const std::vector<std::string>& args);
+	  bool print_ban(const std::vector<std::string>& args);
+  bool ban(const std::vector<std::string>& args);
+  bool unban(const std::vector<std::string>& args);
 	bool print_stat(const std::vector<std::string>& args);
 	bool start_mining(const std::vector<std::string>& args);
 	bool status(const std::vector<std::string>& args);
