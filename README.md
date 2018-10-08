@@ -15,7 +15,10 @@ log
 * can generate integrated addresses pkwallet
 * integrated addresses pkwallet rpc and gateway now
 * can find unlocked inputs that could be optimized, still working on the optimization
-* import/export electrum seeds
+* import/export electrum(mnemonics) seeds
+* stripped non-english dictionaries (until PK is translated more, no use)
+* WARNING- old wallets are not deterministic, so no 25 words, you can sweep your old wallet
+
 
 ##Security + Fixes + w/e
 * ryo 51% fix for low hash coins makes making long sidechains much harder
