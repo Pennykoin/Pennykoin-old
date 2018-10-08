@@ -15,6 +15,7 @@ log
 * can generate integrated addresses pkwallet
 * integrated addresses pkwallet rpc and gateway now
 * can find unlocked inputs that could be optimized, still working on the optimization
+* import/export electrum seeds
 
 ##Security + Fixes + w/e
 * ryo 51% fix for low hash coins makes making long sidechains much harder
@@ -25,6 +26,8 @@ log
 * more detailed rpc error messages
 * network speed optimization from karbo
 * triangular distribution of mixins from XMR
+* mixins through gui&cli softcoded between 5-7 mixin, will be hardcoded next hard fork.  RPC commands still allow less mixins for pools/exchanges
+
 
 
 ##Daemon
@@ -32,6 +35,7 @@ log
 * /getinfo has number of gen coins
 * status command for daemon
 * implemented ban/unban commands and autoban (for clients with wrong version or bad handshake)
+* tx info has confirmations field
 
 
 
