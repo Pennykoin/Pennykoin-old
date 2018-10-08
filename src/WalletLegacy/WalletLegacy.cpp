@@ -451,6 +451,11 @@ namespace CryptoNote {
 
 		return m_transactionsCache.getDeposit(depositId, deposit);
 	}
+size_t WalletLegacy::getNumUnlockedOutputs() {
+  std::vector<TransactionOutputInformation> outputs;
+  m_transferDetails->getOutputs(outputs, ITransfersContainer::IncludeKeyUnlocked);
+  return outputs.size();
+}
 
 	TransactionId WalletLegacy::sendTransaction(const WalletLegacyTransfer& transfer,
 		uint64_t fee,

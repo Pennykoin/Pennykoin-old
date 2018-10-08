@@ -237,6 +237,17 @@ namespace Tools
 				}
 			};
 		};
+ struct COMMAND_RPC_GET_OUTPUTS
+  {
+    typedef CryptoNote::EMPTY_STRUCT request;
+    struct response
+    {
+      size_t num_unlocked_outputs;
+      void serialize(ISerializer& s) {
+        KV_MEMBER(num_unlocked_outputs)
+      }
+    };
+  };
 
 		struct COMMAND_RPC_RESET {
 			typedef CryptoNote::EMPTY_STRUCT request;
