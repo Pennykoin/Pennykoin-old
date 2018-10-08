@@ -39,6 +39,7 @@ log
 * status command for daemon
 * implemented ban/unban commands and autoban (for clients with wrong version or bad handshake)
 * tx info has confirmations field
+* faster chain sync
 
 
 
