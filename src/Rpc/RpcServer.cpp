@@ -716,6 +716,7 @@ namespace CryptoNote {
 				block_short.cumul_size = blokBlobSize + tx_cumulative_block_size - minerTxBlobSize;
 				block_short.tx_count = blk.transactionHashes.size() + 1;
 				res.block = block_short;
+				 res.txDetails.confirmations = m_protocolQuery.getObservedHeight() - blockHeight;
 			}
 		}
 

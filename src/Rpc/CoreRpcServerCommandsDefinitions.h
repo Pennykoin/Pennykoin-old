@@ -439,6 +439,7 @@ namespace CryptoNote {
 		uint64_t mixin;
 		uint64_t fee;
 		uint64_t amount_out;
+		 uint32_t confirmations = 0;
 
 		void serialize(ISerializer &s) {
 			KV_MEMBER(hash)
@@ -446,6 +447,7 @@ namespace CryptoNote {
 				KV_MEMBER(paymentId)
 				KV_MEMBER(mixin)
 				KV_MEMBER(fee)
+				 KV_MEMBER(confirmations)
 				KV_MEMBER(amount_out)
 		}
 	};
