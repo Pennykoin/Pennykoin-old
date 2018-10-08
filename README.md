@@ -29,8 +29,8 @@ log
 * more detailed rpc error messages
 * network speed optimization from karbo
 * triangular distribution of mixins from XMR
-* mixins through gui&cli softcoded between 5-7 mixin, will be hardcoded next hard fork.  RPC commands still allow less mixins for pools/exchanges
-
+* softcoded min mixin of 5
+* hardcoded max mixin of 9 ( will scan BC to ensure there arent any larger yet.
 
 
 ##Daemon
