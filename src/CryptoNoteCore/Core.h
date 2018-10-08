@@ -148,8 +148,8 @@ namespace CryptoNote {
 		bool check_tx_syntax(const Transaction& tx);
 		//check correct values, amounts and all lightweight checks not related with database
 		bool check_tx_semantic(const Transaction& tx, bool keeped_by_block);
-		//check if tx already in memory pool or in main blockchain
-		   bool check_tx_mixin(const Transaction& tx);
+		//c   bool check_tx_mixin(const Transaction& tx);heck if tx already in memory pool or in main blockchain
+		
 
 		bool is_key_image_spent(const Crypto::KeyImage& key_im);
 
