@@ -1,3 +1,5 @@
+
+This repo being phased out, future GUI wallet releases will be in PKCli repo.
 # Pennykoin
 
    Pennykoin is a private, secure cryptocurrency forked form digital/dark/ducknote.  There was no premine or ICO, all coins are emitted as mining rewards or interest.
